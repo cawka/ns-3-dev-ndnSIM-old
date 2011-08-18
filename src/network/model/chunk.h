@@ -2,6 +2,7 @@
 #define CHUNK_H
 
 #include "ns3/object-base.h"
+#include "ns3/simple-ref-count.h"
 #include "buffer.h"
 
 namespace ns3 {
@@ -11,7 +12,7 @@ namespace ns3 {
  *
  * \brief abstract base class for ns3::Header and ns3::Trailer
  */
-class Chunk : public ObjectBase
+class Chunk : public SimpleRefCount<Chunk,ObjectBase>
 {
 public:
   static TypeId GetTypeId (void); 
