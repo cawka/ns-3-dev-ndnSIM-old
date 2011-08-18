@@ -251,6 +251,13 @@ public:
     /**
      * \return the byte read in the buffer.
      *
+	 * Read data, but do not advance the Iterator read.
+     */
+    inline uint8_t  PeekU8 (void);
+
+    /**
+     * \return the byte read in the buffer.
+     *
      * Read data and advance the Iterator by the number of bytes
      * read.
      */
@@ -332,10 +339,20 @@ public:
      * \param size number of bytes to copy
      *
      * Copy size bytes of data from the internal buffer to the
-     * input buffer and avance the Iterator by the number of
+     * input buffer and advance the Iterator by the number of
      * bytes read.
      */
     void Read (uint8_t *buffer, uint32_t size);
+
+	/**
+	 * \param start start iterator of the buffer to copy data into
+	 * \param size  number of bytes to copy
+	 *
+	 * Copy size bytes of data from the internal buffer to the input buffer via
+	 * the provided iterator and advance the Iterator by the number of bytes
+	 * read.
+	 */
+	void Read (Iterator start, uint32_t size);
 
     /**
      * \brief Calculate the checksum.
@@ -811,6 +828,29 @@ Buffer::Iterator::ReadNtohU32 (void)
   retval |= buffer[3];
   m_current += 4;
   return retval;
+}
+
+uint8_t
+Buffer::Iterator::PeekU8 (void)
+{
+  NS_ASSERT_MSG (m_current >= m_dataStart &&
+                 m_current <= m_dataEnd,
+                 GetReadErrorMessage ());
+
+  if (m_current < m_zeroStart)
+    {
+      uint8_t data = m_data[m_current];
+      return data;
+    }
+  else if (m_current < m_zeroEnd)
+    {
+      return 0;
+    }
+  else
+    {
+      uint8_t data = m_data[m_current - (m_zeroEnd-m_zeroStart)];
+      return data;
+    }
 }
 
 uint8_t

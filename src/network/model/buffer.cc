@@ -1115,6 +1115,15 @@ Buffer::Iterator::Read (uint8_t *buffer, uint32_t size)
     }
 }
 
+void
+Buffer::Iterator::Read (Buffer::Iterator start, uint32_t size)
+{
+  for (uint32_t i = 0; i < size; i++)
+    {
+      start.WriteU8 (ReadU8 ());
+    }
+}
+
 uint16_t
 Buffer::Iterator::CalculateIpChecksum (uint16_t size)
 {
