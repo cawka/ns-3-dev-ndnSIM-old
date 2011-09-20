@@ -274,6 +274,27 @@ public:
   void Add (std::string nodeName);
 
   /**
+   * \brief Wrapper for NodeContainer::Add
+   *
+   * \param other The NodeContainer to append.
+   */
+  NodeContainer& operator () (NodeContainer other);
+  
+  /**
+   * \brief Wrapper for NodeContainer::Add
+   *
+   * \param node The Ptr<Node> to append.
+   */
+  NodeContainer& operator () (Ptr<Node> node);
+  
+  /**
+   * \brief Wrapper for NodeContainer::Add
+   *
+   * \param nodeName The name of the Node Object to add to the container.
+   */
+  NodeContainer& operator () (std::string nodeName);
+  
+  /**
    * \brief Create a NodeContainer that contains a list of _all_ nodes
    * created through NodeContainer::Create() and stored in the 
    * ns3::NodeList.

@@ -125,6 +125,29 @@ NodeContainer::Add (std::string nodeName)
   m_nodes.push_back (node);
 }
 
+
+NodeContainer&
+NodeContainer::operator () (NodeContainer other)
+{
+  Add (other);
+  return *this;
+}
+
+NodeContainer&
+NodeContainer::operator () (Ptr<Node> node)
+{
+  Add (node);
+  return *this;
+}
+  
+NodeContainer&
+NodeContainer::operator () (std::string nodeName)
+{
+  Add (nodeName);
+  return *this;
+}
+
+
 NodeContainer 
 NodeContainer::GetGlobal (void)
 {
