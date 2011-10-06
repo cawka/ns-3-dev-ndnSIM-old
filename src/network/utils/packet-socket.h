@@ -141,6 +141,53 @@ private:
 
 };
 
+/**
+ * \brief  This class implements a tag that carries the dest address of a packet and the packet type.
+ *
+ */
+class PacketSocketTag : public Tag
+{
+public:
+  PacketSocketTag ();
+  void SetPacketType (NetDevice::PacketType t);
+  NetDevice::PacketType GetPacketType (void) const;
+  void SetDestAddress(Address a);
+  Address GetDestAddress (void) const;
+
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+  virtual uint32_t GetSerializedSize (void) const;
+  virtual void Serialize (TagBuffer i) const;
+  virtual void Deserialize (TagBuffer i);
+  virtual void Print (std::ostream &os) const;
+
+private:
+  std::string m_deviceName;
+  NetDevice::PacketType m_packetType;
+  Address m_destAddr;
+};
+/**
+ * \brief  This class implements a tag that carries the ns3 device name from where a packet is coming.
+ *
+ */
+class DeviceNameTag : public Tag
+{
+public:
+  DeviceNameTag ();
+  void SetDeviceName (std::string n);
+  std::string GetDeviceName (void) const;
+
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+  virtual uint32_t GetSerializedSize (void) const;
+  virtual void Serialize (TagBuffer i) const;
+  virtual void Deserialize (TagBuffer i);
+  virtual void Print (std::ostream &os) const;
+
+private:
+  std::string m_deviceName;
+};
+
 } // namespace ns3
 
 #endif /* PACKET_SOCKET_H */
