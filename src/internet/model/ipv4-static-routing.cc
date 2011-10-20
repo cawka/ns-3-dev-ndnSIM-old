@@ -712,11 +712,11 @@ Ipv4StaticRouting::PrintRoutingTable (Ptr<OutputStreamWrapper> stream) const
         {
           std::ostringstream dest, gw, mask, flags;
           Ipv4RoutingTableEntry route = GetRoute (j);
-          dest << route.GetDest ();
+          dest << route.GetDest (); 
           *os << std::setiosflags (std::ios::left) << std::setw (16) << dest.str ();
-          gw << route.GetGateway ();
+          gw << route.GetGateway (); 
           *os << std::setiosflags (std::ios::left) << std::setw (16) << gw.str ();
-          mask << route.GetDestNetworkMask ();
+          mask << route.GetDestNetworkMask (); 
           *os << std::setiosflags (std::ios::left) << std::setw (16) << mask.str ();
           flags << "U";
           if (route.IsHost ())

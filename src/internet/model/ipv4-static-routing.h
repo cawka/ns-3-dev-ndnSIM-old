@@ -374,7 +374,7 @@ public:
 protected:
   virtual void DoDispose (void);
 
-private:
+protected:
   typedef std::list<std::pair <Ipv4RoutingTableEntry *, uint32_t> > NetworkRoutes;
   typedef std::list<std::pair <Ipv4RoutingTableEntry *, uint32_t> >::const_iterator NetworkRoutesCI;
   typedef std::list<std::pair <Ipv4RoutingTableEntry *, uint32_t> >::iterator NetworkRoutesI;

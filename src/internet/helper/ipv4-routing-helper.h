@@ -23,6 +23,7 @@
 #include "ns3/ptr.h"
 #include "ns3/nstime.h"
 #include "ns3/output-stream-wrapper.h"
+#include "ns3/ipv4-list-routing.h"
 
 namespace ns3 {
 
@@ -107,10 +108,40 @@ public:
    */
   void PrintRoutingTableEvery (Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const;
 
+  template<class T>
+  static Ptr<T> GetRouting (Ptr<Ipv4RoutingProtocol> ipv4rp, T*);
+  
 private:
   void Print (Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const;
   void PrintEvery (Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const;
 };
+
+// This function does a recursive search for a requested routing protocol.
+// Strictly speaking this recursion is not necessary, but why not?
+template<class T>
+Ptr<T> Ipv4RoutingHelper::GetRouting (Ptr<Ipv4RoutingProtocol> ipv4rp, T* type)
+{
+  if (ipv4rp == 0) return 0;
+
+  if (DynamicCast<T> (ipv4rp))
+    {
+      return DynamicCast<T> (ipv4rp); 
+    } 
+  else if (DynamicCast<Ipv4ListRouting> (ipv4rp))
+    {
+      Ptr<Ipv4ListRouting> lrp = DynamicCast<Ipv4ListRouting> (ipv4rp);
+      for (uint32_t i = 0; i < lrp->GetNRoutingProtocols ();  i++)
+        {
+          int16_t priority;
+          Ptr<T> ret = GetRouting (lrp->GetRoutingProtocol (i, priority), type);
+          if (ret != 0)
+            {
+              return ret;
+            }
+        }
+    }
+  return 0;
+}
 
 } // namespace ns3
 
