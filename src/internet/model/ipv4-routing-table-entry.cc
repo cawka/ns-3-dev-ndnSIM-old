@@ -35,7 +35,8 @@ Ipv4RoutingTableEntry::Ipv4RoutingTableEntry (Ipv4RoutingTableEntry const &route
   : m_dest (route.m_dest),
     m_destNetworkMask (route.m_destNetworkMask),
     m_gateway (route.m_gateway),
-    m_interface (route.m_interface)
+    m_interface (route.m_interface),
+    m_metric (route.m_metric) 
 {
 }
 
@@ -43,44 +44,53 @@ Ipv4RoutingTableEntry::Ipv4RoutingTableEntry (Ipv4RoutingTableEntry const *route
   : m_dest (route->m_dest),
     m_destNetworkMask (route->m_destNetworkMask),
     m_gateway (route->m_gateway),
-    m_interface (route->m_interface)
+    m_interface (route->m_interface),
+    m_metric (route->m_metric)
 {
 }
 
 Ipv4RoutingTableEntry::Ipv4RoutingTableEntry (Ipv4Address dest,
                                               Ipv4Address gateway,
-                                              uint32_t interface)
+                                              uint32_t interface,
+                                              uint32_t metric/*=0*/)
   : m_dest (dest),
     m_destNetworkMask (Ipv4Mask::GetOnes ()),
     m_gateway (gateway),
-    m_interface (interface)
+    m_interface (interface),
+    m_metric (metric)
 {
 }
 Ipv4RoutingTableEntry::Ipv4RoutingTableEntry (Ipv4Address dest,
-                                              uint32_t interface)
+                                              uint32_t interface,
+                                              uint32_t metric/*=0*/)
   : m_dest (dest),
     m_destNetworkMask (Ipv4Mask::GetOnes ()),
     m_gateway (Ipv4Address::GetZero ()),
-    m_interface (interface)
+    m_interface (interface),
+    m_metric (metric)
 {
 }
 Ipv4RoutingTableEntry::Ipv4RoutingTableEntry (Ipv4Address network,
                                               Ipv4Mask networkMask,
                                               Ipv4Address gateway,
-                                              uint32_t interface)
+                                              uint32_t interface,
+                                              uint32_t metric/*=0*/)
   : m_dest (network),
     m_destNetworkMask (networkMask),
     m_gateway (gateway),
-    m_interface (interface)
+    m_interface (interface),
+    m_metric (metric)
 {
 }
 Ipv4RoutingTableEntry::Ipv4RoutingTableEntry (Ipv4Address network,
                                               Ipv4Mask networkMask,
-                                              uint32_t interface)
+                                              uint32_t interface,
+                                              uint32_t metric/*=0*/)
   : m_dest (network),
     m_destNetworkMask (networkMask),
     m_gateway (Ipv4Address::GetZero ()),
-    m_interface (interface)
+    m_interface (interface),
+    m_metric (metric)
 {
 }
 
@@ -151,41 +161,52 @@ Ipv4RoutingTableEntry::GetInterface (void) const
   return m_interface;
 }
 
+uint32_t
+Ipv4RoutingTableEntry::GetMetric () const
+{
+  return m_metric;
+}
+
 Ipv4RoutingTableEntry 
 Ipv4RoutingTableEntry::CreateHostRouteTo (Ipv4Address dest, 
                                           Ipv4Address nextHop,
-                                          uint32_t interface)
+                                          uint32_t interface,
+                                          uint32_t metric/*=0*/)
 {
-  return Ipv4RoutingTableEntry (dest, nextHop, interface);
+  return Ipv4RoutingTableEntry (dest, nextHop, interface, metric);
 }
 Ipv4RoutingTableEntry 
 Ipv4RoutingTableEntry::CreateHostRouteTo (Ipv4Address dest,
-                                          uint32_t interface)
+                                          uint32_t interface,
+                                          uint32_t metric/*=0*/)
 {
-  return Ipv4RoutingTableEntry (dest, interface);
+  return Ipv4RoutingTableEntry (dest, interface, metric);
 }
 Ipv4RoutingTableEntry 
 Ipv4RoutingTableEntry::CreateNetworkRouteTo (Ipv4Address network, 
                                              Ipv4Mask networkMask,
                                              Ipv4Address nextHop,
-                                             uint32_t interface)
+                                             uint32_t interface,
+                                             uint32_t metric/*=0*/)
 {
   return Ipv4RoutingTableEntry (network, networkMask, 
-                                nextHop, interface);
+                                nextHop, interface, metric);
 }
 Ipv4RoutingTableEntry 
 Ipv4RoutingTableEntry::CreateNetworkRouteTo (Ipv4Address network, 
                                              Ipv4Mask networkMask,
-                                             uint32_t interface)
+                                             uint32_t interface,
+                                             uint32_t metric/*=0*/)
 {
   return Ipv4RoutingTableEntry (network, networkMask, 
-                                interface);
+                                interface, metric);
 }
 Ipv4RoutingTableEntry 
 Ipv4RoutingTableEntry::CreateDefaultRoute (Ipv4Address nextHop, 
-                                           uint32_t interface)
+                                           uint32_t interface,
+                                           uint32_t metric/*=0*/)
 {
-  return Ipv4RoutingTableEntry (Ipv4Address::GetZero (), nextHop, interface);
+  return Ipv4RoutingTableEntry (Ipv4Address::GetZero (), nextHop, interface, metric);
 }
 
 
@@ -216,20 +237,21 @@ std::ostream& operator<< (std::ostream& os, Ipv4RoutingTableEntry const& route)
         {
           os << "network=" << route.GetDestNetwork () <<
           ", mask=" << route.GetDestNetworkMask () <<
-          ",out=" << route.GetInterface () <<
+          ", out=" << route.GetInterface () <<
           ", next hop=" << route.GetGateway ();
         }
       else
         {
           os << "network=" << route.GetDestNetwork () <<
           ", mask=" << route.GetDestNetworkMask () <<
-          ",out=" << route.GetInterface ();
+          ", out=" << route.GetInterface ();
         }
     }
   else
     {
       NS_ASSERT (false);
     }
+  os << ", metric=" << route.GetMetric ();
   return os;
 }
 

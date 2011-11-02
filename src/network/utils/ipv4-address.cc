@@ -130,10 +130,10 @@ Ipv4Mask::GetInverse (void) const
 void 
 Ipv4Mask::Print (std::ostream &os) const
 {
-  os << ((m_mask >> 24) & 0xff) << "."
-     << ((m_mask >> 16) & 0xff) << "."
-     << ((m_mask >> 8) & 0xff) << "."
-     << ((m_mask >> 0) & 0xff);
+  os << (int)((m_mask >> 24) & 0xff) << "."
+     << (int)((m_mask >> 16) & 0xff) << "."
+     << (int)((m_mask >> 8) & 0xff) << "."
+     << (int)((m_mask >> 0) & 0xff);
 }
 
 
@@ -183,7 +183,7 @@ Ipv4Address::Ipv4Address (char const *address)
   m_address = AsciiToIpv4Host (address);
 }
 
-uint32_t
+const uint32_t &
 Ipv4Address::Get (void) const
 {
   return m_address;
