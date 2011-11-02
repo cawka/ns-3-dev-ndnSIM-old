@@ -57,7 +57,8 @@ public:
    * Get the host-order 32-bit IP address
    * \return the host-order 32-bit IP address
    */
-  uint32_t Get (void) const;
+  const uint32_t &
+  Get (void) const;
   /**
    * input address is in host order.
    * \param address The host order 32-bit address

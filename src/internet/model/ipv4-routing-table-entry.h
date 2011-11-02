@@ -89,6 +89,11 @@ public:
    */
   uint32_t GetInterface (void) const;
   /**
+   * \return Routing metric
+   */
+  uint32_t GetMetric () const;
+
+  /**
    * \return An Ipv4RoutingTableEntry object corresponding to the input parameters.
    * \param dest Ipv4Address of the destination
    * \param nextHop Ipv4Address of the next hop
@@ -96,14 +101,16 @@ public:
    */
   static Ipv4RoutingTableEntry CreateHostRouteTo (Ipv4Address dest, 
                                                   Ipv4Address nextHop,
-                                                  uint32_t interface);
+                                                  uint32_t interface,
+                                                  uint32_t metric=0);
   /**
    * \return An Ipv4RoutingTableEntry object corresponding to the input parameters.
    * \param dest Ipv4Address of the destination
    * \param interface Outgoing interface 
    */
   static Ipv4RoutingTableEntry CreateHostRouteTo (Ipv4Address dest, 
-                                                  uint32_t interface);
+                                                  uint32_t interface,
+                                                  uint32_t metric=0);
   /**
    * \return An Ipv4RoutingTableEntry object corresponding to the input parameters.
    * \param network Ipv4Address of the destination network
@@ -114,7 +121,8 @@ public:
   static Ipv4RoutingTableEntry CreateNetworkRouteTo (Ipv4Address network, 
                                                      Ipv4Mask networkMask,
                                                      Ipv4Address nextHop,
-                                                     uint32_t interface);
+                                                     uint32_t interface,
+                                                     uint32_t metric=0);
   /**
    * \return An Ipv4RoutingTableEntry object corresponding to the input parameters.
    * \param network Ipv4Address of the destination network
@@ -123,7 +131,8 @@ public:
    */
   static Ipv4RoutingTableEntry CreateNetworkRouteTo (Ipv4Address network, 
                                                      Ipv4Mask networkMask,
-                                                     uint32_t interface);
+                                                     uint32_t interface,
+                                                     uint32_t metric=0);
   /**
    * \return An Ipv4RoutingTableEntry object corresponding to the input 
    * parameters.  This route is distinguished; it will match any 
@@ -132,26 +141,32 @@ public:
    * \param interface Outgoing interface 
    */
   static Ipv4RoutingTableEntry CreateDefaultRoute (Ipv4Address nextHop, 
-                                                   uint32_t interface);
+                                                   uint32_t interface,
+                                                   uint32_t metric=0);
 
 private:
   Ipv4RoutingTableEntry (Ipv4Address network,
                          Ipv4Mask mask,
                          Ipv4Address gateway,
-                         uint32_t interface);
+                         uint32_t interface,
+                         uint32_t metric=0);
   Ipv4RoutingTableEntry (Ipv4Address dest,
                          Ipv4Mask mask,
-                         uint32_t interface);
+                         uint32_t interface,
+                         uint32_t metric=0);
   Ipv4RoutingTableEntry (Ipv4Address dest,
                          Ipv4Address gateway,
-                         uint32_t interface);
+                         uint32_t interface,
+                         uint32_t metric=0);
   Ipv4RoutingTableEntry (Ipv4Address dest,
-                         uint32_t interface);
+                         uint32_t interface,
+                         uint32_t metric=0);
 
   Ipv4Address m_dest;
   Ipv4Mask m_destNetworkMask;
   Ipv4Address m_gateway;
   uint32_t m_interface;
+  uint32_t m_metric;
 };
 
 std::ostream& operator<< (std::ostream& os, Ipv4RoutingTableEntry const& route);

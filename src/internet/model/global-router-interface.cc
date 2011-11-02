@@ -28,8 +28,10 @@
 #include "ns3/ipv4.h"
 #include "ns3/bridge-net-device.h"
 #include "ipv4-global-routing.h"
+#include "ns3/loopback-net-device.h"
 #include "global-router-interface.h"
 #include <vector>
+
 
 NS_LOG_COMPONENT_DEFINE ("GlobalRouter");
 
@@ -752,6 +754,8 @@ GlobalRouter::ProcessSingleBroadcastLink (Ptr<NetDevice> nd, GlobalRoutingLSA *p
 {
   NS_LOG_FUNCTION (nd << pLSA << &c);
 
+  if (DynamicCast<LoopbackNetDevice> (nd)) return; //don't announce loopback addresses
+  
   GlobalRoutingLinkRecord *plr = new GlobalRoutingLinkRecord;
   NS_ABORT_MSG_IF (plr == 0, "GlobalRouter::ProcessSingleBroadcastLink(): Can't alloc link record");
 
