@@ -61,7 +61,7 @@ public:
    * \returns a newly-created routing protocol
    */
   virtual Ptr<Ipv4RoutingProtocol> Create (Ptr<Node> node) const = 0;
-  
+
   /**
    * \brief prints the routing tables of all nodes at a particular time.
    * \param printTime the time at which the routing table is supposed to be printed.
@@ -135,12 +135,12 @@ Ptr<T> Ipv4RoutingHelper::GetRouting (Ptr<Ipv4RoutingProtocol> protocol)
       // trying to check if protocol is a list routing
       Ptr<Ipv4ListRouting> lrp = DynamicCast<Ipv4ListRouting> (protocol);
       if (lrp != 0)
+    {
+      for (uint32_t i = 0; i < lrp->GetNRoutingProtocols ();  i++)
         {
-          for (uint32_t i = 0; i < lrp->GetNRoutingProtocols ();  i++)
-            {
-              int16_t priority;
+          int16_t priority;
               ret = GetRouting<T> (lrp->GetRoutingProtocol (i, priority)); // potential recursion, if inside ListRouting is ListRouting
-              if (ret != 0)
+          if (ret != 0)
                 break;
             }
         }

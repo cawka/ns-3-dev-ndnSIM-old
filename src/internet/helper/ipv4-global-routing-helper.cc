@@ -20,6 +20,7 @@
 #include "ipv4-global-routing-helper.h"
 #include "ns3/global-router-interface.h"
 #include "ns3/ipv4-global-routing.h"
+#include "ns3/ipv4-global-routing-one-nexthop.h"
 #include "ns3/ipv4-list-routing.h"
 #include "ns3/log.h"
 
@@ -27,11 +28,13 @@ NS_LOG_COMPONENT_DEFINE ("GlobalRoutingHelper");
 
 namespace ns3 {
 
-Ipv4GlobalRoutingHelper::Ipv4GlobalRoutingHelper ()
+Ipv4GlobalRoutingHelper::Ipv4GlobalRoutingHelper (GlobalRoutingType type/* = ONE_NEXT_HOP*/)
+: m_type (type)
 {
 }
 
 Ipv4GlobalRoutingHelper::Ipv4GlobalRoutingHelper (const Ipv4GlobalRoutingHelper &o)
+: m_type (o.m_type)
 {
 }
 
@@ -51,8 +54,16 @@ Ipv4GlobalRoutingHelper::Create (Ptr<Node> node) const
   node->AggregateObject (globalRouter);
 
   NS_LOG_LOGIC ("Adding GlobalRouting Protocol to node " << node->GetId ());
-  Ptr<Ipv4GlobalRouting> globalRouting = CreateObject<Ipv4GlobalRouting> ();
-  globalRouter->SetRoutingProtocol (globalRouting);
+  Ptr<Ipv4GlobalRouting> globalRouting = 0;
+  switch (m_type)
+    {
+    case ONE_NEXT_HOP:
+      globalRouting = CreateObject<Ipv4GlobalRoutingOneNexthop> ();
+      break;
+    default:
+      NS_ASSERT_MSG (false, "Unsupported (yet) global routing type");
+      break;
+    }
 
   return globalRouting;
 }

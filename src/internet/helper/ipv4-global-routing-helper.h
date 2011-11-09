@@ -31,11 +31,18 @@ namespace ns3 {
 class Ipv4GlobalRoutingHelper  : public Ipv4RoutingHelper
 {
 public:
+  enum GlobalRoutingType
+    { ONE_NEXT_HOP = 0,
+      ORDERED_NEXT_HOPS = 1,
+      UNORDERED_NEXT_HOPS = 2};
+  
   /**
    * \brief Construct a GlobalRoutingHelper to make life easier for managing
    * global routing tasks.
+   *
+   * param type Type of the global routing
    */
-  Ipv4GlobalRoutingHelper ();
+  Ipv4GlobalRoutingHelper (GlobalRoutingType type = ONE_NEXT_HOP);
 
   /**
    * \brief Construct a GlobalRoutingHelper from another previously initialized
@@ -90,6 +97,8 @@ private:
    * assignment and prevent the compiler from happily inserting its own.
    */
   Ipv4GlobalRoutingHelper &operator = (const Ipv4GlobalRoutingHelper &o);
+
+  GlobalRoutingType m_type;
 };
 
 } // namespace ns3
