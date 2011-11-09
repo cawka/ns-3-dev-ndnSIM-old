@@ -37,7 +37,6 @@
 namespace ns3 {
 
 class GlobalRouter;
-class Ipv4GlobalRouting;
 
 /**
  * @brief A single link record for a link state advertisement.
@@ -588,10 +587,6 @@ public:
  */
   GlobalRouter ();
 
-
-  void SetRoutingProtocol (Ptr<Ipv4GlobalRouting> routing);
-  Ptr<Ipv4GlobalRouting> GetRoutingProtocol (void);
-
 /**
  * @brief Get the Router ID associated with this Global Router.
  *
@@ -666,35 +661,35 @@ public:
  * @param network The Network to inject
  * @param networkMask The Network Mask to inject
  */
-  void InjectRoute (Ipv4Address network, Ipv4Mask networkMask);
+  void InjectRoute (Ipv4Address network, Ipv4Mask networkMask, uint32_t metric=1);
 
-/**
- * @brief Get the number of injected routes that have been added
- * to the routing table.
- * @return number of injected routes
- */
-  uint32_t GetNInjectedRoutes (void);
+// /**
+//  * @brief Get the number of injected routes that have been added
+//  * to the routing table.
+//  * @return number of injected routes
+//  */
+//   uint32_t GetNInjectedRoutes (void) const;
 
-/**
- * @brief Return the injected route indexed by i
- * @param i the index of the route
- * @return a pointer to that Ipv4RoutingTableEntry is returned
- *
- */
-  Ipv4RoutingTableEntry *GetInjectedRoute (uint32_t i);
+// /**
+//  * @brief Return the injected route indexed by i
+//  * @param i the index of the route
+//  * @return a pointer to that Ipv4RoutingTableEntry is returned
+//  *
+//  */
+//   const Ipv4RoutingTableEntry& GetInjectedRoute (uint32_t i) const;
 
-/**
- * @brief Withdraw a route from the global unicast routing table.
- *
- * Calling this function will cause all indexed routes numbered above
- * index i to have their index decremented.  For instance, it is possible to
- * remove N injected routes by calling RemoveInjectedRoute (0) N times.
- *
- * @param i The index (into the injected routing list) of the route to remove.
- *
- * @see GlobalRouter::WithdrawRoute ()
- */
-  void RemoveInjectedRoute (uint32_t i);
+// /**
+//  * @brief Withdraw a route from the global unicast routing table.
+//  *
+//  * Calling this function will cause all indexed routes numbered above
+//  * index i to have their index decremented.  For instance, it is possible to
+//  * remove N injected routes by calling RemoveInjectedRoute (0) N times.
+//  *
+//  * @param i The index (into the injected routing list) of the route to remove.
+//  *
+//  * @see GlobalRouter::WithdrawRoute ()
+//  */
+//   void RemoveInjectedRoute (uint32_t i);
 
 /**
  * @brief Withdraw a route from the global unicast routing table.
@@ -728,12 +723,10 @@ private:
   ListOfLSAs_t m_LSAs;
 
   Ipv4Address m_routerId;
-  Ptr<Ipv4GlobalRouting> m_routingProtocol;
+  // Ptr<Ipv4GlobalRouting> m_routingProtocol;
 
-  typedef std::list<Ipv4RoutingTableEntry *> InjectedRoutes;
-  typedef std::list<Ipv4RoutingTableEntry *>::const_iterator InjectedRoutesCI;
-  typedef std::list<Ipv4RoutingTableEntry *>::iterator InjectedRoutesI;
-  InjectedRoutes m_injectedRoutes; // Routes we are exporting
+  typedef std::list<Ipv4RoutingTableEntry> RouteList;
+  RouteList m_injectedRoutes; // Routes we are exporting
 
   // inherited from Object
   virtual void DoDispose (void);

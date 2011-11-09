@@ -109,7 +109,7 @@ public:
   void PrintRoutingTableEvery (Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const;
 
   template<class T>
-  static Ptr<T> GetRouting (Ptr<Ipv4RoutingProtocol> ipv4rp, T*);
+  static Ptr<T> GetRouting (Ptr<Ipv4RoutingProtocol> ipv4rp);
   
 private:
   void Print (Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const;
@@ -119,7 +119,7 @@ private:
 // This function does a recursive search for a requested routing protocol.
 // Strictly speaking this recursion is not necessary, but why not?
 template<class T>
-Ptr<T> Ipv4RoutingHelper::GetRouting (Ptr<Ipv4RoutingProtocol> ipv4rp, T* type)
+Ptr<T> Ipv4RoutingHelper::GetRouting (Ptr<Ipv4RoutingProtocol> ipv4rp)
 {
   if (ipv4rp == 0) return 0;
 
@@ -133,7 +133,7 @@ Ptr<T> Ipv4RoutingHelper::GetRouting (Ptr<Ipv4RoutingProtocol> ipv4rp, T* type)
       for (uint32_t i = 0; i < lrp->GetNRoutingProtocols ();  i++)
         {
           int16_t priority;
-          Ptr<T> ret = GetRouting (lrp->GetRoutingProtocol (i, priority), type);
+          Ptr<T> ret = GetRouting<T> (lrp->GetRoutingProtocol (i, priority));
           if (ret != 0)
             {
               return ret;
