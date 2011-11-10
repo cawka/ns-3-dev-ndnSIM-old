@@ -92,6 +92,10 @@ public:
    * \return Routing metric
    */
   uint32_t GetMetric () const;
+  /**
+   * Set/Updates metric of the routing table entry
+   */
+  void SetMetric (uint32_t metric);
 
   /**
    * \return An Ipv4RoutingTableEntry object corresponding to the input parameters.

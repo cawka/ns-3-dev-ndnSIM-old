@@ -715,6 +715,11 @@ public:
  */
   virtual void DeleteGlobalRoutes ();
 
+  /**
+   * @brief Reset LSDB without clearing routing entries
+   */
+  virtual void ClearLSDB ();
+  
 /**
  * @brief Build the routing database by gathering Link State Advertisements
  * from each node exporting a GlobalRouter interface.

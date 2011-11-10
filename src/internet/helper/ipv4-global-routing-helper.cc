@@ -28,7 +28,9 @@ NS_LOG_COMPONENT_DEFINE ("GlobalRoutingHelper");
 
 namespace ns3 {
 
-Ipv4GlobalRoutingHelper::Ipv4GlobalRoutingHelper (GlobalRoutingType type/* = ONE_NEXT_HOP*/)
+UniformVariable Ipv4GlobalRoutingHelper::m_rand;
+
+Ipv4GlobalRoutingHelper::Ipv4GlobalRoutingHelper (const std::string &type/* = "ns3::Ipv4GlobalRoutingOneNexthop"*/)
 : m_type (type)
 {
 }
@@ -54,16 +56,10 @@ Ipv4GlobalRoutingHelper::Create (Ptr<Node> node) const
   node->AggregateObject (globalRouter);
 
   NS_LOG_LOGIC ("Adding GlobalRouting Protocol to node " << node->GetId ());
-  Ptr<Ipv4GlobalRouting> globalRouting = 0;
-  switch (m_type)
-    {
-    case ONE_NEXT_HOP:
-      globalRouting = CreateObject<Ipv4GlobalRoutingOneNexthop> ();
-      break;
-    default:
-      NS_ASSERT_MSG (false, "Unsupported (yet) global routing type");
-      break;
-    }
+
+  ObjectFactory factory;
+  factory.SetTypeId (m_type);
+  Ptr<Ipv4GlobalRouting> globalRouting = DynamicCast<Ipv4GlobalRouting> (factory.Create<Object> ());
 
   return globalRouting;
 }
@@ -74,6 +70,102 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables (void)
   GlobalRouteManager::BuildGlobalRoutingDatabase ();
   GlobalRouteManager::InitializeRoutes ();
 }
+
+void
+Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables (void)
+{
+  NodeList::Iterator listEnd = NodeList::End ();
+  for (NodeList::Iterator node = NodeList::Begin (); node != listEnd; node++)
+    {
+      // if ((*node)->GetId ()!=3) continue;
+      
+      Ptr<Ipv4> ipv4 = (*node)->GetObject<Ipv4> ();
+      NS_ASSERT (ipv4 != 0);
+
+      // remember interface statuses
+      std::vector<uint16_t> originalMetric (ipv4->GetNInterfaces ());
+      for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
+        {
+          originalMetric[iface] = ipv4->GetMetric (iface);
+        }
+
+      UniformVariable m_rand;
+      // enable interfaces one by one and calculate routes
+      for (uint32_t enabledInterface = 1; enabledInterface < ipv4->GetNInterfaces (); enabledInterface++)
+        {
+          NS_LOG_ERROR ("Enabled interface: " << enabledInterface);
+          
+          for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
+            {
+              ipv4->SetMetric (iface,  m_rand.GetInteger (1, UINT16_MAX));
+            }
+          ipv4->SetMetric (enabledInterface, originalMetric[enabledInterface]);
+
+          GlobalRouteManager::ClearLSDB ();
+          GlobalRouteManager::BuildGlobalRoutingDatabase ();
+          GlobalRouteManager::InitializeRoutes ();
+        }
+
+      // restore original interface statuses
+      for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
+        {
+          ipv4->SetMetric (iface, originalMetric[iface]);
+        }
+    }  
+}
+
+// void
+// Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables (void)
+// {
+//   for (int xx = 0; xx < 100; xx++)
+//     {
+//       for (NodeList::Iterator node = NodeList::Begin (); node != NodeList::End (); node++)
+//         {
+//           Ptr<Ipv4> ipv4 = (*node)->GetObject<Ipv4> ();
+//           NS_ASSERT (ipv4 != 0);
+
+//           // // remember interface statuses
+//           // std::vector<uint16_t> originalMetric (ipv4->GetNInterfaces ());
+//           // for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
+//           //   {
+//           //     originalMetric[iface] = ipv4->GetMetric (iface);
+//           //   }
+
+//           // enable interfaces one by one and calculate routes
+//           // for (uint32_t enabledInterface = 1; enabledInterface < ipv4->GetNInterfaces (); enabledInterface++)
+//           //   {
+//           //     NS_LOG_ERROR ("Enabled interface: " << enabledInterface);
+          
+//               for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
+//                 {
+//                   ipv4->SetMetric (iface,  m_rand.GetInteger (1, 500));
+//                 }
+//               // ipv4->SetMetric (enabledInterface, originalMetric[enabledInterface]);
+
+//             // }
+
+//           // // restore original interface statuses
+//           // for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
+//           //   {
+//           //     ipv4->SetMetric (iface, originalMetric[iface]);
+//           //   }
+//         }  
+//       GlobalRouteManager::ClearLSDB ();
+//       GlobalRouteManager::BuildGlobalRoutingDatabase ();
+//       GlobalRouteManager::InitializeRoutes ();
+
+//       // Ptr<GlobalRouter> rtr = 
+//       //   (*node)->GetObject<GlobalRouter> ();
+      
+//       // if (rtr && rtr->GetNumLSAs () )
+//       //   {
+//       //     SimulationSingleton<GlobalRouteManagerImpl>::Get ()->
+//       //       SPFCalculate (rtr->GetRouterId ());
+//       //   }
+//     }
+// }
+
+
 void 
 Ipv4GlobalRoutingHelper::RecomputeRoutingTables (void)
 {
