@@ -22,7 +22,12 @@
 #include "ns3/ipv4-global-routing.h"
 #include "ns3/ipv4-global-routing-one-nexthop.h"
 #include "ns3/ipv4-list-routing.h"
+#include "ns3/node-list.h"
 #include "ns3/log.h"
+
+#ifndef UINT16_MAX
+# define UINT16_MAX     (65535)
+#endif
 
 NS_LOG_COMPONENT_DEFINE ("GlobalRoutingHelper");
 
@@ -114,56 +119,45 @@ Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables (void)
     }  
 }
 
-// void
-// Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables (void)
-// {
-//   for (int xx = 0; xx < 100; xx++)
-//     {
-//       for (NodeList::Iterator node = NodeList::Begin (); node != NodeList::End (); node++)
-//         {
-//           Ptr<Ipv4> ipv4 = (*node)->GetObject<Ipv4> ();
-//           NS_ASSERT (ipv4 != 0);
+void Ipv4GlobalRoutingHelper::PopulateRandomRoutingTables (uint32_t n)
+{
+  PopulateRoutingTables (); // populate normal routing table
+  
+  for (uint32_t routingSet = 1; routingSet < n; routingSet++)
+    {
+      for (NodeList::Iterator node = NodeList::Begin (); node != NodeList::End (); node++)
+        {
+          Ptr<Ipv4> ipv4 = (*node)->GetObject<Ipv4> ();
+          NS_ASSERT (ipv4 != 0);
 
-//           // // remember interface statuses
-//           // std::vector<uint16_t> originalMetric (ipv4->GetNInterfaces ());
-//           // for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
-//           //   {
-//           //     originalMetric[iface] = ipv4->GetMetric (iface);
-//           //   }
+          Ptr<Ipv4GlobalRouting> globalRouting = GetRouting<Ipv4GlobalRouting> (ipv4->GetRoutingProtocol ());
+          NS_ASSERT_MSG (globalRouting != 0,
+                         "A valid Ipv4GlobalRouting should exist");
 
-//           // enable interfaces one by one and calculate routes
-//           // for (uint32_t enabledInterface = 1; enabledInterface < ipv4->GetNInterfaces (); enabledInterface++)
-//           //   {
-//           //     NS_LOG_ERROR ("Enabled interface: " << enabledInterface);
+          globalRouting->FixRoutes ();
           
-//               for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
-//                 {
-//                   ipv4->SetMetric (iface,  m_rand.GetInteger (1, 500));
-//                 }
-//               // ipv4->SetMetric (enabledInterface, originalMetric[enabledInterface]);
+          // std::vector<uint16_t> originalMetric (ipv4->GetNInterfaces ());
+          // for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
+          //   {
+          //     originalMetric[iface] = ipv4->GetMetric (iface);
+          //   }
 
-//             // }
-
-//           // // restore original interface statuses
-//           // for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
-//           //   {
-//           //     ipv4->SetMetric (iface, originalMetric[iface]);
-//           //   }
-//         }  
-//       GlobalRouteManager::ClearLSDB ();
-//       GlobalRouteManager::BuildGlobalRoutingDatabase ();
-//       GlobalRouteManager::InitializeRoutes ();
-
-//       // Ptr<GlobalRouter> rtr = 
-//       //   (*node)->GetObject<GlobalRouter> ();
-      
-//       // if (rtr && rtr->GetNumLSAs () )
-//       //   {
-//       //     SimulationSingleton<GlobalRouteManagerImpl>::Get ()->
-//       //       SPFCalculate (rtr->GetRouterId ());
-//       //   }
-//     }
-// }
+          for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
+            {
+              ipv4->SetMetric (iface,  m_rand.GetInteger (1, UINT16_MAX/10)); // just to prevent integer overflow
+            }
+          
+          // // restore original interface statuses
+          // for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
+          //   {
+          //     ipv4->SetMetric (iface, originalMetric[iface]);
+          //   }
+        }  
+      GlobalRouteManager::ClearLSDB ();
+      GlobalRouteManager::BuildGlobalRoutingDatabase ();
+      GlobalRouteManager::InitializeRoutes ();
+    }
+}
 
 
 void 

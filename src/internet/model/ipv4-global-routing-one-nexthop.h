@@ -42,6 +42,8 @@ class Ipv4GlobalRoutingOneNexthop : public Ipv4GlobalRouting
 public:
   static TypeId GetTypeId (void);
 
+  Ipv4GlobalRoutingOneNexthop ();
+  
   // These methods inherited from base class
   // from Ipv4RoutingProtocol
   virtual Ptr<Ipv4Route> RouteOutput (Ptr<Packet> p, const Ipv4Header &header,

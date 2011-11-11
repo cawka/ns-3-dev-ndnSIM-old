@@ -50,6 +50,11 @@ Ipv4GlobalRouting::Ipv4GlobalRouting ()
 {
 }
 
+void
+Ipv4GlobalRouting::FixRoutes ()
+{
+}
+
 void 
 Ipv4GlobalRouting::NotifyInterfaceUp (uint32_t i)
 {

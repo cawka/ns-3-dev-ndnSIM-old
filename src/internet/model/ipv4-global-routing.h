@@ -92,6 +92,11 @@ public:
    */
   virtual void DeleteRoutes () = 0;
 
+  /**
+   * \brief Function to fix current routes (will make sense only for multiple route implementation)
+   */
+  virtual void FixRoutes ();
+
 protected:
   // virtual Ptr<Ipv4Route> LookupGlobal (Ipv4Address dest, Ptr<NetDevice> oif = 0) = 0;
   
