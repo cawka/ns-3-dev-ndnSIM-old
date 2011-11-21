@@ -51,6 +51,7 @@ class Ipv4RoutingProtocol : public Object
 {
 public:
   static TypeId GetTypeId (void);
+  virtual ~Ipv4RoutingProtocol ();
 
   typedef Callback<void, Ptr<Ipv4Route>, Ptr<const Packet>, const Ipv4Header &> UnicastForwardCallback;
   typedef Callback<void, Ptr<Ipv4MulticastRoute>, Ptr<const Packet>, const Ipv4Header &> MulticastForwardCallback;
