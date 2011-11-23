@@ -101,7 +101,7 @@ public:
    */
   void SetNode (Ptr<Node> node);
 
-private:
+protected:
   /**
    * \brief Application specific startup code
    *
@@ -119,6 +119,7 @@ private:
    * subclasses.
    */
   virtual void StopApplication (void);
+  
 protected:
   virtual void DoDispose (void);
   virtual void DoStart (void);
