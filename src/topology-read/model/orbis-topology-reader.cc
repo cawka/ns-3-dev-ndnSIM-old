@@ -29,19 +29,19 @@
 
 using namespace std;
 
-namespace ns3 {
-
 NS_LOG_COMPONENT_DEFINE ("OrbisTopologyReader");
 
-NS_OBJECT_ENSURE_REGISTERED (OrbisTopologyReader);
+namespace ns3 {
 
-TypeId OrbisTopologyReader::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::OrbisTopologyReader")
-    .SetParent<Object> ()
-  ;
-  return tid;
-}
+// NS_OBJECT_ENSURE_REGISTERED (OrbisTopologyReader);
+
+// TypeId OrbisTopologyReader::GetTypeId (void)
+// {
+//   static TypeId tid = TypeId ("ns3::OrbisTopologyReader")
+//     .SetParent<Object> ()
+//   ;
+//   return tid;
+// }
 
 OrbisTopologyReader::OrbisTopologyReader ()
 {
