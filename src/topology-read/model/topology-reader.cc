@@ -106,10 +106,21 @@ TopologyReader::Link::Link ()
 {
 }
 
+void
+TopologyReader::Link::SetNetDevices (Ptr<NetDevice> from, Ptr<NetDevice> to)
+{
+  m_fromNetDevice = from;
+  m_toNetDevice = to;
+}
 
 Ptr<Node> TopologyReader::Link::GetFromNode (void) const
 {
   return m_fromPtr;
+}
+
+Ptr<NetDevice> TopologyReader::Link::GetFromNetDevice (void) const
+{
+  return m_fromNetDevice;
 }
 
 std::string
@@ -122,6 +133,12 @@ Ptr<Node>
 TopologyReader::Link::GetToNode (void) const
 {
   return m_toPtr;
+}
+
+Ptr<NetDevice>
+TopologyReader::Link::GetToNetDevice (void) const
+{
+  return m_toNetDevice;
 }
 
 std::string
