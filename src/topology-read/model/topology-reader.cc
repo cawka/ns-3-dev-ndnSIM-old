@@ -19,24 +19,23 @@
  * Author: Valerio Sartini (valesar@gmail.com)
  */
 
-#include "ns3/log.h"
-
 #include "topology-reader.h"
 
+#include "ns3/log.h"
 
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("TopologyReader");
 
-NS_OBJECT_ENSURE_REGISTERED (TopologyReader);
+// NS_OBJECT_ENSURE_REGISTERED (TopologyReader);
 
-TypeId TopologyReader::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::TopologyReader")
-    .SetParent<Object> ()
-  ;
-  return tid;
-}
+// TypeId TopologyReader::GetTypeId (void)
+// {
+//   static TypeId tid = TypeId ("ns3::TopologyReader")
+//     .SetParent<Object> ()
+//   ;
+//   return tid;
+// }
 
 TopologyReader::TopologyReader ()
 {
