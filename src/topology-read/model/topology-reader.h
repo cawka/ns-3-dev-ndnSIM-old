@@ -22,13 +22,11 @@
 #ifndef TOPOLOGY_READER_H
 #define TOPOLOGY_READER_H
 
-#include <string>
 #include <map>
 #include <list>
 
-#include "ns3/object.h"
 #include "ns3/node-container.h"
-
+#include "ns3/simple-ref-count.h"
 
 namespace ns3 {
 
@@ -42,7 +40,7 @@ class NetDevice;
  * This interface perform the shared tasks among all possible input file readers.
  * Each different file format is handled by its own topology reader.
  */
-class TopologyReader : public Object
+class TopologyReader : public SimpleRefCount<TopologyReader>
 {
 
 public:
@@ -157,7 +155,7 @@ private:
    */
   typedef std::list< Link >::const_iterator ConstLinksIterator;
 
-  static TypeId GetTypeId (void);
+  // static TypeId GetTypeId (void);
 
   TopologyReader ();
   virtual ~TopologyReader ();
