@@ -21,7 +21,6 @@
 #ifndef ROCKETFUEL_TOPOLOGY_READER_H
 #define ROCKETFUEL_TOPOLOGY_READER_H
 
-#include "ns3/nstime.h"
 #include "topology-reader.h"
 
 namespace ns3 {
@@ -43,7 +42,7 @@ namespace ns3 {
 class RocketfuelTopologyReader : public TopologyReader
 {
 public:
-  static TypeId GetTypeId (void);
+  // static TypeId GetTypeId (void);
 
   RocketfuelTopologyReader ();
   virtual ~RocketfuelTopologyReader ();
