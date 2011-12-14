@@ -55,6 +55,17 @@ public:
    * z coordinate of vector
    */
   double z;
+
+  double GetLength () const;
+
+  Vector3D& operator += (const Vector3D &);  
+  Vector3D& operator += (double);
+  Vector3D  operator + (const Vector3D &) const;
+  Vector3D  operator + (double) const;
+  Vector3D  operator * (const Vector3D &) const;
+  Vector3D  operator * (double v) const;
+  Vector3D  operator - (const Vector3D &) const;
+  Vector3D  operator / (double) const;
 };
 
 /**
@@ -82,6 +93,17 @@ public:
    * y coordinate of vector
    */
   double y;
+
+  double GetLength () const;
+
+  Vector2D& operator += (const Vector2D &);  
+  Vector2D& operator += (double);
+  Vector2D  operator + (const Vector2D &) const;
+  Vector2D  operator + (double) const;
+  Vector2D  operator * (const Vector2D &) const;
+  Vector2D  operator * (double v) const;
+  Vector2D  operator - (const Vector2D &) const;
+  Vector2D  operator / (double) const;
 };
 
 /**
@@ -97,6 +119,19 @@ double CalculateDistance (const Vector3D &a, const Vector3D &b);
  * \returns the cartesian distance between a and b.
  */
 double CalculateDistance (const Vector2D &a, const Vector2D &b);
+
+/**
+ * \brief Calculate scalar multiplication between two vectors
+ * \param a one point
+ * \param b another point
+ */
+double ScalarMultiplication (const Vector3D &a, const Vector3D &b);
+/**
+ * \brief Calculate scalar multiplication between two vectors
+ * \param a one point
+ * \param b another point
+ */
+double ScalarMultiplication (const Vector2D &a, const Vector2D &b);
 
 /**
  * \class ns3::Vector3DValue
