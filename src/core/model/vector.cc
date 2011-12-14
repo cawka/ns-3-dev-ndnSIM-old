@@ -47,6 +47,68 @@ Vector3D::Vector3D ()
 {
 }
 
+double
+Vector3D::GetLength () const
+{
+  return sqrt (x*x + y*y + z*z);
+}
+
+Vector3D& 
+Vector3D::operator += (const Vector3D &v)
+{
+  x += v.x;
+  y += v.y;
+  z += v.z;
+
+  return *this;
+}
+
+Vector3D& 
+Vector3D::operator += (double v)
+{
+  x += v;
+  y += v;
+  z += v;
+
+  return *this;
+}
+
+Vector3D  
+Vector3D::operator + (const Vector3D &v) const
+{
+  return Vector3D (x+v.x, y+v.y, z+v.z);
+}
+
+Vector3D  
+Vector3D::operator + (double v) const
+{
+  return Vector3D (x+v, y+v, z+v);
+}
+
+Vector3D  
+Vector3D::operator * (const Vector3D &v) const
+{
+  return Vector3D (x*v.x, y*v.y, z*v.z);
+}
+
+Vector3D  
+Vector3D::operator * (double v) const
+{
+  return Vector3D (x*v, y*v, z*v);
+}
+
+Vector3D
+Vector3D::operator - (const Vector3D &v) const
+{
+  return Vector3D (x-v.x, y-v.y, z-v.z);
+}
+
+Vector3D
+Vector3D::operator / (double div) const
+{
+  return Vector3D (x/div, y/div, z/div);
+}
+
 Vector2D::Vector2D (double _x, double _y)
   : x (_x),
     y (_y)
@@ -57,6 +119,66 @@ Vector2D::Vector2D ()
   : x (0.0),
     y (0.0)
 {
+}
+
+double
+Vector2D::GetLength () const
+{
+  return sqrt (x*x + y*y);
+}
+
+Vector2D& 
+Vector2D::operator += (const Vector2D &v)
+{
+  x += v.x;
+  y += v.y;
+
+  return *this;
+}
+
+Vector2D& 
+Vector2D::operator += (double v)
+{
+  x += v;
+  y += v;
+
+  return *this;
+}
+
+Vector2D  
+Vector2D::operator + (const Vector2D &v) const
+{
+  return Vector2D (x+v.x, y+v.y);
+}
+
+Vector2D  
+Vector2D::operator + (double v) const
+{
+  return Vector2D (x+v, y+v);
+}
+
+Vector2D  
+Vector2D::operator * (const Vector2D &v) const
+{
+  return Vector2D (x*v.x, y*v.y);
+}
+
+Vector2D  
+Vector2D::operator * (double v) const
+{
+  return Vector2D (x*v, y*v);
+}
+
+Vector2D
+Vector2D::operator - (const Vector2D &v) const
+{
+  return Vector2D (x-v.x, y-v.y);
+}
+
+Vector2D
+Vector2D::operator / (double div) const
+{
+  return Vector2D (x/div, y/div);
 }
 
 double
@@ -75,6 +197,21 @@ CalculateDistance (const Vector2D &a, const Vector2D &b)
   double dy = b.y - a.y;
   double distance = std::sqrt (dx * dx + dy * dy);
   return distance;
+}
+
+
+double
+ScalarMultiplication (const Vector3D &a, const Vector3D &b)
+{
+  Vector3D tmp = a * b;
+  return tmp.x + tmp.y + tmp.z;
+}
+
+double
+ScalarMultiplication (const Vector2D &a, const Vector2D &b)
+{
+  Vector2D tmp = a * b;
+  return tmp.x + tmp.y;
 }
 
 std::ostream &operator << (std::ostream &os, const Vector3D &vector)
