@@ -64,6 +64,12 @@ public:
 
   virtual void DeleteRoutes ();
 
+  uint32_t
+  GetNRoutes () const;
+  
+  Ipv4RoutingTableEntry
+  GetRoute (uint32_t i) const;
+
 protected:
   virtual Ptr<Ipv4Route> LookupGlobal (Ipv4Address dest, Ptr<NetDevice> oif = 0);
   
