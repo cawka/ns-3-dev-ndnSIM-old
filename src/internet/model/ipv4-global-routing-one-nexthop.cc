@@ -94,10 +94,18 @@ Ipv4GlobalRoutingOneNexthop::LookupGlobal (Ipv4Address dest, Ptr<NetDevice> oif)
   NS_LOG_FUNCTION_NOARGS ();
   NS_LOG_LOGIC ("Looking for route for destination " << dest);
 
-  Ipv4AddressTrieMap::const_iterator longest_prefix_map = m_routes.longest_prefix_match (dest);
+  // Cheating with lookups. Need to redesign Trie
+  Ipv4AddressTrieMap::const_iterator longest_prefix_map;
+  Ipv4Mask mask ("255.255.255.255");
+  do {
+    NS_LOG_DEBUG ("Try mask " << mask);
+    longest_prefix_map = m_routes.longest_prefix_match (dest.CombineMask (mask));
+    mask = Ipv4Mask (mask.Get () << 8);
+  } while (longest_prefix_map == m_routes.end () && !mask.IsEqual (Ipv4Mask::GetZero ()));
+               
   if (longest_prefix_map == m_routes.end ())
     {
-      NS_LOG_LOGIC ("Found " << longest_prefix_map->second);
+      NS_LOG_LOGIC ("Route not found...");
       return 0;
     }
 
@@ -279,5 +287,26 @@ Ipv4GlobalRoutingOneNexthop::RouteInput (Ptr<const Packet> p, const Ipv4Header &
                     // route request.
     }
 }
+
+uint32_t
+Ipv4GlobalRoutingOneNexthop::GetNRoutes () const
+{
+  return m_routes.size ();
+}
+  
+Ipv4RoutingTableEntry
+Ipv4GlobalRoutingOneNexthop::GetRoute (uint32_t i) const
+{
+  uint32_t index = 0;
+  for (Ipv4AddressTrieMap::const_iterator it = m_routes.begin ();
+       index <= i && it != m_routes.end ();
+       it++, index++)
+    {
+      if (index == i) return it->second;
+    }
+  NS_ASSERT (false);
+  return Ipv4RoutingTableEntry ();
+}
+
 
 } // namespace ns3
