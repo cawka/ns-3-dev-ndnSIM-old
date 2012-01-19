@@ -347,12 +347,12 @@ WifiRemoteStationManager::PrepareForQueue (Mac48Address address, const WifiMacHe
   WifiRemoteStation *station = Lookup (address, header);
   WifiMode rts = DoGetRtsMode (station);
   WifiMode data = DoGetDataMode (station, fullPacketSize);
-  TxModeTag tag;
+  
   // first, make sure that the tag is not here anymore.
-  ConstCast<Packet> (packet)->RemovePacketTag (tag);
-  tag = TxModeTag (rts, data);
+  ConstCast<Packet> (packet)->RemovePacketTag<TxModeTag> ();
+  Ptr<TxModeTag> tag = CreateObject<TxModeTag> (rts, data);
   // and then, add it back
-  packet->AddPacketTag (tag);
+  ConstCast<Packet> (packet)->AddPacketTag (tag);
 }
 WifiMode
 WifiRemoteStationManager::GetDataMode (Mac48Address address, const WifiMacHeader *header,
@@ -364,11 +364,9 @@ WifiRemoteStationManager::GetDataMode (Mac48Address address, const WifiMacHeader
     }
   if (!IsLowLatency ())
     {
-      TxModeTag tag;
-      bool found;
-      found = ConstCast<Packet> (packet)->PeekPacketTag (tag);
-      NS_ASSERT (found);
-      return tag.GetDataMode ();
+      Ptr<const TxModeTag> tag = packet->PeekPacketTag<TxModeTag> ();
+      NS_ASSERT (tag != 0);
+      return tag->GetDataMode ();
     }
   return DoGetDataMode (Lookup (address, header), fullPacketSize);
 }
@@ -379,11 +377,9 @@ WifiRemoteStationManager::GetRtsMode (Mac48Address address, const WifiMacHeader 
   NS_ASSERT (!address.IsGroup ());
   if (!IsLowLatency ())
     {
-      TxModeTag tag;
-      bool found;
-      found = ConstCast<Packet> (packet)->PeekPacketTag (tag);
-      NS_ASSERT (found);
-      return tag.GetRtsMode ();
+      Ptr<const TxModeTag> tag = packet->PeekPacketTag<TxModeTag> ();
+      NS_ASSERT (tag != 0);
+      return tag->GetRtsMode ();
     }
   return DoGetRtsMode (Lookup (address, header));
 }

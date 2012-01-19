@@ -59,13 +59,13 @@ QosUtilsMapTidToAc (uint8_t tid)
 uint8_t
 QosUtilsGetTidForPacket (Ptr<const Packet> packet)
 {
-  QosTag qos;
+  Ptr<const QosTag> qos = packet->PeekPacketTag<QosTag> ();
   uint8_t tid = 8;
-  if (packet->PeekPacketTag (qos))
+  if (qos != 0)
     {
-      if (qos.GetTid () < 8)
+      if (qos->GetTid () < 8)
         {
-          tid = qos.GetTid ();
+          tid = qos->GetTid ();
         }
     }
   return tid;

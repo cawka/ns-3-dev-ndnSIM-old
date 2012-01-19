@@ -51,13 +51,13 @@ public:
   HwmpTag ();
   ~HwmpTag ();
   void  SetAddress (Mac48Address retransmitter);
-  Mac48Address GetAddress ();
+  Mac48Address GetAddress () const;
   void  SetTtl (uint8_t ttl);
-  uint8_t GetTtl ();
+  uint8_t GetTtl () const;
   void  SetMetric (uint32_t metric);
-  uint32_t GetMetric ();
+  uint32_t GetMetric () const;
   void  SetSeqno (uint32_t seqno);
-  uint32_t GetSeqno ();
+  uint32_t GetSeqno () const;
   void  DecrementTtl ();
 
   static  TypeId  GetTypeId ();

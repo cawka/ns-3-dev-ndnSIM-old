@@ -163,19 +163,19 @@ benchD (uint32_t n)
 {
   BenchHeader<25> ipv4;
   BenchHeader<8> udp;
-  BenchTag<16> tag1;
-  BenchTag<17> tag2;
 
   for (uint32_t i = 0; i < n; i++) {
     Ptr<Packet> p = Create<Packet> (2000);
-    p->AddPacketTag (tag1);
+    p->AddPacketTag (CreateObject<BenchTag<16> > ());
     p->AddHeader (udp);
-    p->RemovePacketTag (tag1);
-    p->AddPacketTag (tag2);
+    p->RemovePacketTag (BenchTag<16>::GetTypeId ());
+    
+    p->AddPacketTag (CreateObject<BenchTag<17> > ());
     p->AddHeader (ipv4);
+    
     Ptr<Packet> o = p->Copy ();
     o->RemoveHeader (ipv4);
-    p->RemovePacketTag (tag2);
+    p->RemovePacketTag (BenchTag<17>::GetTypeId ());
     o->RemoveHeader (udp);
   }
 }

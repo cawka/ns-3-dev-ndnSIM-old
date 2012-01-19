@@ -709,12 +709,11 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiMode txMode, WifiPreamb
            && m_currentPacket != 0)
     {
       NS_LOG_DEBUG ("receive cts from=" << m_currentHdr.GetAddr1 ());
-      SnrTag tag;
-      packet->RemovePacketTag (tag);
+      Ptr<const SnrTag> tag = packet->RemovePacketTag<SnrTag> ();
       m_stationManager->ReportRxOk (m_currentHdr.GetAddr1 (), &m_currentHdr,
                                     rxSnr, txMode);
       m_stationManager->ReportRtsOk (m_currentHdr.GetAddr1 (), &m_currentHdr,
-                                     rxSnr, txMode, tag.Get ());
+                                     rxSnr, txMode, tag->Get ());
 
       m_ctsTimeoutEvent.Cancel ();
       NotifyCtsTimeoutResetNow ();
@@ -734,12 +733,11 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiMode txMode, WifiPreamb
            && m_txParams.MustWaitAck ())
     {
       NS_LOG_DEBUG ("receive ack from=" << m_currentHdr.GetAddr1 ());
-      SnrTag tag;
-      packet->RemovePacketTag (tag);
+      Ptr<const SnrTag> tag = packet->RemovePacketTag<SnrTag> ();
       m_stationManager->ReportRxOk (m_currentHdr.GetAddr1 (), &m_currentHdr,
                                     rxSnr, txMode);
       m_stationManager->ReportDataOk (m_currentHdr.GetAddr1 (), &m_currentHdr,
-                                      rxSnr, txMode, tag.Get ());
+                                      rxSnr, txMode, tag->Get ());
       bool gotAck = false;
       if (m_txParams.MustWaitNormalAck ()
           && m_normalAckTimeoutEvent.IsRunning ())
@@ -1446,8 +1444,8 @@ MacLow::SendCtsAfterRts (Mac48Address source, Time duration, WifiMode rtsTxMode,
   WifiMacTrailer fcs;
   packet->AddTrailer (fcs);
 
-  SnrTag tag;
-  tag.Set (rtsSnr);
+  Ptr<SnrTag> tag = CreateObject<SnrTag> ();
+  tag->Set (rtsSnr);
   packet->AddPacketTag (tag);
 
   ForwardDown (packet, &cts, ctsTxMode);
@@ -1525,8 +1523,8 @@ MacLow::SendAckAfterData (Mac48Address source, Time duration, WifiMode dataTxMod
   WifiMacTrailer fcs;
   packet->AddTrailer (fcs);
 
-  SnrTag tag;
-  tag.Set (dataSnr);
+  Ptr<SnrTag> tag = CreateObject<SnrTag> ();
+  tag->Set (dataSnr);
   packet->AddPacketTag (tag);
 
   ForwardDown (packet, &ack, ackTxMode);

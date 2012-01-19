@@ -340,9 +340,9 @@ bool Ipv6RawSocketImpl::ForwardUp (Ptr<const Packet> p, Ipv6Header hdr, Ptr<NetD
       // Should check via getsockopt ()..
       if (IsRecvPktInfo ())
         {
-          Ipv6PacketInfoTag tag;
-          copy->RemovePacketTag (tag);
-          tag.SetRecvIf (device->GetIfIndex ());
+          Ptr<const Ipv6PacketInfoTag> origTag = copy->RemovePacketTag<Ipv6PacketInfoTag> ();
+          Ptr<Ipv6PacketInfoTag> tag = CreateObject<Ipv6PacketInfoTag> (*origTag);
+          tag->SetRecvIf (device->GetIfIndex ());
           copy->AddPacketTag (tag);
         }
 

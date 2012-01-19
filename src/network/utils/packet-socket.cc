@@ -385,13 +385,13 @@ PacketSocket::ForwardUp (Ptr<NetDevice> device, Ptr<const Packet> packet,
   if ((m_rxAvailable + packet->GetSize ()) <= m_rcvBufSize)
     {
       Ptr<Packet> copy = packet->Copy ();
-      DeviceNameTag dnt;
-      dnt.SetDeviceName (device->GetTypeId ().GetName ());
-      PacketSocketTag pst;
-      pst.SetPacketType (packetType);
-      pst.SetDestAddress (to);
-      SocketAddressTag tag;
-      tag.SetAddress (address);
+      Ptr<DeviceNameTag> dnt = CreateObject<DeviceNameTag> ();
+      dnt->SetDeviceName (device->GetTypeId ().GetName ());
+      Ptr<PacketSocketTag> pst = CreateObject<PacketSocketTag> ();
+      pst->SetPacketType (packetType);
+      pst->SetDestAddress (to);
+      Ptr<SocketAddressTag> tag = CreateObject<SocketAddressTag> ();
+      tag->SetAddress (address);
       copy->AddPacketTag (tag); // Attach From Physical Address
       copy->AddPacketTag (pst); // Attach Packet Type and Dest Address
       copy->AddPacketTag (dnt); // Attach device source name
@@ -449,11 +449,9 @@ PacketSocket::RecvFrom (uint32_t maxSize, uint32_t flags, Address &fromAddress)
   Ptr<Packet> packet = Recv (maxSize, flags);
   if (packet != 0)
     {
-      SocketAddressTag tag;
-      bool found;
-      found = packet->PeekPacketTag (tag);
-      NS_ASSERT (found);
-      fromAddress = tag.GetAddress ();
+      Ptr<const SocketAddressTag> tag = packet->PeekPacketTag<SocketAddressTag> ();
+      NS_ASSERT (tag != 0);
+      fromAddress = tag->GetAddress ();
     }
   return packet;
 }
@@ -611,15 +609,13 @@ uint32_t
 DeviceNameTag::GetSerializedSize (void) const
 {
   uint32_t s = 1 + m_deviceName.size();
-  return ( s >= PACKET_TAG_MAX_SIZE)?PACKET_TAG_MAX_SIZE:s;
+  return s;
 }
 void
 DeviceNameTag::Serialize (TagBuffer i) const
 {
   const char *n = m_deviceName.c_str();
   uint8_t l = (uint8_t) strlen (n);
-
-  if ( ( 1 + l ) > PACKET_TAG_MAX_SIZE ) l = PACKET_TAG_MAX_SIZE - 1;
 
   i.WriteU8 (l);
   i.Write ( (uint8_t*) n , (uint32_t) l );

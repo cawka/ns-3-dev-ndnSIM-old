@@ -104,52 +104,52 @@ private:
   ByteTagList::Iterator m_current;
 };
 
-/**
- * \ingroup packet
- * \brief Iterator over the set of 'packet' tags in a packet
- *
- * This is a java-style iterator.
- */
-class PacketTagIterator
-{
-public:
-  /**
-   * Identifies a tag within a packet.
-   */
-  class Item 
-  {
-public:
-    /**
-     * \returns the ns3::TypeId associated to this tag.
-     */
-    TypeId GetTypeId (void) const;
-    /**
-     * \param tag the user tag to which the data should be copied.
-     *
-     * Read the requested tag and store it in the user-provided
-     * tag instance. This method will crash if the type of the
-     * tag provided by the user does not match the type of
-     * the underlying tag.
-     */
-    void GetTag (Tag &tag) const;
-private:
-    friend class PacketTagIterator;
-    Item (const struct PacketTagList::TagData *data);
-    const struct PacketTagList::TagData *m_data;
-  };
-  /**
-   * \returns true if calling Next is safe, false otherwise.
-   */
-  bool HasNext (void) const;
-  /**
-   * \returns the next item found and prepare for the next one.
-   */
-  Item Next (void);
-private:
-  friend class Packet;
-  PacketTagIterator (const struct PacketTagList::TagData *head);
-  const struct PacketTagList::TagData *m_current;
-};
+// /**
+//  * \ingroup packet
+//  * \brief Iterator over the set of 'packet' tags in a packet
+//  *
+//  * This is a java-style iterator.
+//  */
+// class PacketTagIterator
+// {
+// public:
+//   /**
+//    * Identifies a tag within a packet.
+//    */
+//   class Item 
+//   {
+// public:
+//     /**
+//      * \returns the ns3::TypeId associated to this tag.
+//      */
+//     TypeId GetTypeId (void) const;
+//     /**
+//      * \param tag the user tag to which the data should be copied.
+//      *
+//      * Read the requested tag and store it in the user-provided
+//      * tag instance. This method will crash if the type of the
+//      * tag provided by the user does not match the type of
+//      * the underlying tag.
+//      */
+//     void GetTag (Tag &tag) const;
+// private:
+//     friend class PacketTagIterator;
+//     Item (const struct PacketTagList::TagData *data);
+//     const struct PacketTagList::TagData *m_data;
+//   };
+//   /**
+//    * \returns true if calling Next is safe, false otherwise.
+//    */
+//   bool HasNext (void) const;
+//   /**
+//    * \returns the next item found and prepare for the next one.
+//    */
+//   Item Next (void);
+// private:
+//   friend class Packet;
+//   PacketTagIterator (const struct PacketTagList::TagData *head);
+//   const struct PacketTagList::TagData *m_current;
+// };
 
 /**
  * \ingroup packet
@@ -495,34 +495,57 @@ public:
    */
   void PrintByteTags (std::ostream &os) const;
 
-  /**
-   * \param tag the tag to store in this packet
-   *
-   * Add a tag to this packet. This method calls the
-   * Tag::GetSerializedSize and, then, Tag::Serialize.
-   *
-   * Note that this method is const, that is, it does not
-   * modify the state of this packet, which is fairly
-   * un-intuitive.
-   */
-  void AddPacketTag (const Tag &tag) const;
-  /**
-   * \param tag the tag to remove from this packet
-   * \returns true if the requested tag is found, false
-   *          otherwise.
-   *
-   * Remove a tag from this packet. This method calls
-   * Tag::Deserialize if the tag is found.
-   */
-  bool RemovePacketTag (Tag &tag);
-  /**
-   * \param tag the tag to search in this packet
-   * \returns true if the requested tag is found, false
-   *          otherwise.
-   *
-   * Search a matching tag and call Tag::Deserialize if it is found.
-   */
-  bool PeekPacketTag (Tag &tag) const;
+  void
+  AddPacketTag (Ptr<const Tag> tag);
+
+  Ptr<const Tag>
+  RemovePacketTag (TypeId tagType);
+
+  template<class T>
+  Ptr<const T>
+  RemovePacketTag ()
+  {
+    return DynamicCast<const T> (RemovePacketTag (T::GetTypeId ()));
+  }
+  
+  Ptr<const Tag>
+  PeekPacketTag (TypeId tagType) const;
+
+  template<class T>
+  Ptr<const T>
+  PeekPacketTag () const
+  {
+    return DynamicCast<const T> (PeekPacketTag (T::GetTypeId ()));
+  }
+  
+  // /**
+  //  * \param tag the tag to store in this packet
+  //  *
+  //  * Add a tag to this packet. This method calls the
+  //  * Tag::GetSerializedSize and, then, Tag::Serialize.
+  //  *
+  //  * Note that this method is const, that is, it does not
+  //  * modify the state of this packet, which is fairly
+  //  * un-intuitive.
+  //  */
+  // void AddPacketTag (const Tag &tag) const;
+  // /**
+  //  * \param tag the tag to remove from this packet
+  //  * \returns true if the requested tag is found, false
+  //  *          otherwise.
+  //  *
+  //  * Remove a tag from this packet. This method calls
+  //  * Tag::Deserialize if the tag is found.
+  //  */
+  // bool RemovePacketTag (Tag &tag);
+  // /**
+  //  * \param tag the tag to search in this packet
+  //  * \returns true if the requested tag is found, false
+  //  *          otherwise.
+  //  *
+  //  * Search a matching tag and call Tag::Deserialize if it is found.
+  //  */
+  // bool PeekPacketTag (Tag &tag) const;
   /**
    * Remove all packet tags.
    */
@@ -542,7 +565,7 @@ public:
    * \returns an object which can be used to iterate over the list of
    *  packet tags.
    */
-  PacketTagIterator GetPacketTagIterator (void) const;
+  // PacketTagIterator GetPacketTagIterator (void) const;
 
   /* Note: These functions support a temporary solution 
    * to a specific problem in this generic class, i.e. 

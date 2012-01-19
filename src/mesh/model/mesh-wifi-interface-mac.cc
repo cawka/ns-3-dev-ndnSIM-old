@@ -222,15 +222,15 @@ MeshWifiInterfaceMac::ForwardDown (Ptr<const Packet> const_packet, Mac48Address 
   //Classify: application sets a tag, which is removed here
   // Get Qos tag:
   AcIndex ac = AC_BE;
-  QosTag tag;
-  if (packet->RemovePacketTag (tag))
+  Ptr<const QosTag> tag = packet->RemovePacketTag<QosTag> ();
+  if (tag != 0)
     {
       hdr.SetType (WIFI_MAC_QOSDATA);
-      hdr.SetQosTid (tag.GetTid ());
+      hdr.SetQosTid (tag->GetTid ());
       //Aftre setting type DsFrom and DsTo fields are reset.
       hdr.SetDsFrom ();
       hdr.SetDsTo ();
-      ac = QosUtilsMapTidToAc (tag.GetTid ());
+      ac = QosUtilsMapTidToAc (tag->GetTid ());
     }
   m_stats.sentFrames++;
   m_stats.sentBytes += packet->GetSize ();
@@ -446,7 +446,7 @@ MeshWifiInterfaceMac::Receive (Ptr<Packet> packet, WifiMacHeader const *hdr)
   // Check if QoS tag exists and add it:
   if (hdr->IsQosData ())
     {
-      packet->AddPacketTag (QosTag (hdr->GetQosTid ()));
+      packet->AddPacketTag (CreateObject<QosTag> (hdr->GetQosTid ()));
     }
   // Forward data up
   if (hdr->IsData ())

@@ -846,10 +846,10 @@ void Icmpv6L4Protocol::SendMessage (Ptr<Packet> packet, Ipv6Address src, Ipv6Add
 {
   NS_LOG_FUNCTION (this << packet << src << dst << (uint32_t)ttl);
   Ptr<Ipv6L3Protocol> ipv6 = m_node->GetObject<Ipv6L3Protocol> ();
-  SocketIpTtlTag tag;
   NS_ASSERT (ipv6 != 0);
 
-  tag.SetTtl (ttl);
+  Ptr<SocketIpTtlTag> tag = CreateObject<SocketIpTtlTag> ();
+  tag->SetTtl (ttl);
   packet->AddPacketTag (tag);
   m_downTarget (packet, src, dst, PROT_NUMBER, 0);
 }
@@ -860,7 +860,6 @@ void Icmpv6L4Protocol::SendMessage (Ptr<Packet> packet, Ipv6Address dst, Icmpv6H
   Ptr<Ipv6L3Protocol> ipv6 = m_node->GetObject<Ipv6L3Protocol> ();
   NS_ASSERT (ipv6 != 0 && ipv6->GetRoutingProtocol () != 0);
   Ipv6Header header;
-  SocketIpTtlTag tag;
   Socket::SocketErrno err;
   Ptr<Ipv6Route> route;
   Ptr<NetDevice> oif (0); //specify non-zero if bound to a source address
@@ -871,7 +870,8 @@ void Icmpv6L4Protocol::SendMessage (Ptr<Packet> packet, Ipv6Address dst, Icmpv6H
   if (route != 0)
     {
       NS_LOG_LOGIC ("Route exists");
-      tag.SetTtl (ttl);
+      Ptr<SocketIpTtlTag> tag = CreateObject<SocketIpTtlTag> ();
+      tag->SetTtl (ttl);
       packet->AddPacketTag (tag);
       Ipv6Address src = route->GetSource ();
 

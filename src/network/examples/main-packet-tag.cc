@@ -96,8 +96,8 @@ MyTag::GetSimpleValue (void) const
 int main (int argc, char *argv[])
 {
   // create a tag.
-  MyTag tag;
-  tag.SetSimpleValue (0x56);
+  Ptr<MyTag> tag = CreateObject<MyTag> ();
+  tag->SetSimpleValue (0x56);
 
   // store the tag in a packet.
   Ptr<Packet> p = Create<Packet> (100);
@@ -107,11 +107,10 @@ int main (int argc, char *argv[])
   Ptr<Packet> aCopy = p->Copy ();
 
   // read the tag from the packet copy
-  MyTag tagCopy;
-  p->PeekPacketTag (tagCopy);
+  Ptr<const MyTag> tagCopy = p->PeekPacketTag<MyTag> ();
 
   // the copy and the original are the same !
-  NS_ASSERT (tagCopy.GetSimpleValue () == tag.GetSimpleValue ());
+  NS_ASSERT (tagCopy->GetSimpleValue () == tag->GetSimpleValue ());
 
   aCopy->PrintPacketTags (std::cout);
   std::cout << std::endl;

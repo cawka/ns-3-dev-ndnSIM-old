@@ -120,24 +120,22 @@ RoutingExperiment::RoutingExperiment ()
 std::string
 PrintReceivedPacket (Ptr<Socket> socket, Ptr<Packet> packet)
 {
-  SocketAddressTag tag;
-  bool found;
-  found = packet->PeekPacketTag (tag);
+  Ptr<const SocketAddressTag> tag = packet->PeekPacketTag<SocketAddressTag> ();
   std::ostringstream oss;
 
   oss << Simulator::Now ().GetSeconds () << " " << socket->GetNode ()->GetId ();
 
-  if (found)
-    {
-      InetSocketAddress addr = InetSocketAddress::ConvertFrom (tag.GetAddress ());
+  if (tag != 0)
+        {
+      InetSocketAddress addr = InetSocketAddress::ConvertFrom (tag->GetAddress ());
       oss << " received one packet from " << addr.GetIpv4 ();
-    }
-  else
-    {
+        }
+      else
+        {
       oss << " received one packet!";
-    }
+        }
   return oss.str ();
-}
+    }
 
 void
 RoutingExperiment::ReceivePacket (Ptr<Socket> socket)
@@ -148,7 +146,7 @@ RoutingExperiment::ReceivePacket (Ptr<Socket> socket)
       bytesTotal += packet->GetSize ();
       packetsReceived += 1;
       NS_LOG_UNCOND (PrintReceivedPacket (socket, packet));
-    }
+}
 }
 
 void
