@@ -361,7 +361,7 @@ private:
  *
  * See: http://tools.ietf.org/html/rfc5444 for details.
  */
-class PbbPacket : public SimpleRefCount<PbbPacket,Header>
+class PbbPacket : public Header
 {
 public:
   typedef std::list< Ptr<PbbTlv> >::iterator TlvIterator;
