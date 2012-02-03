@@ -199,7 +199,7 @@ private:
 }
 
 template <typename W, typename T, typename U, typename V>
-Ptr<const AttributeAccessor>
+inline Ptr<const AttributeAccessor>
 DoMakeAccessorHelperTwo (void (T::*setter)(U),
                          V (T::*getter)(void) const)
 {
@@ -240,7 +240,7 @@ private:
 }
 
 template <typename W, typename T, typename U, typename V>
-Ptr<const AttributeAccessor>
+inline Ptr<const AttributeAccessor>
 DoMakeAccessorHelperTwo (V (T::*getter)(void) const,
                          void (T::*setter)(U))
 {
@@ -248,7 +248,7 @@ DoMakeAccessorHelperTwo (V (T::*getter)(void) const,
 }
 
 template <typename W, typename T, typename U, typename V>
-Ptr<const AttributeAccessor>
+inline Ptr<const AttributeAccessor>
 DoMakeAccessorHelperTwo (bool (T::*setter)(U),
                          V (T::*getter)(void) const)
 {
@@ -289,7 +289,7 @@ private:
 }
 
 template <typename W, typename T, typename U, typename V>
-Ptr<const AttributeAccessor>
+inline Ptr<const AttributeAccessor>
 DoMakeAccessorHelperTwo (bool (T::*getter)(void) const,
                          void (T::*setter)(U))
 {
@@ -297,14 +297,14 @@ DoMakeAccessorHelperTwo (bool (T::*getter)(void) const,
 }
 
 template <typename V, typename T1>
-Ptr<const AttributeAccessor>
+inline Ptr<const AttributeAccessor>
 MakeAccessorHelper (T1 a1)
 {
   return DoMakeAccessorHelperOne<V> (a1);
 }
 
 template <typename V, typename T1, typename T2>
-Ptr<const AttributeAccessor>
+inline Ptr<const AttributeAccessor>
 MakeAccessorHelper (T1 a1, T2 a2)
 {
   return DoMakeAccessorHelperTwo<V> (a1, a2);
