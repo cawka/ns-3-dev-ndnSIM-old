@@ -44,7 +44,8 @@ void
 ConstantVelocityHelper::SetPosition (const Vector &position)
 {
   m_position = position;
-  m_velocity = Vector (0.0, 0.0, 0.0);
+  // Lucas Wang: we do need the initial velocity, so making the change that it's not zero
+  //m_velocity = Vector (0.0, 0.0, 0.0); 
   m_lastUpdate = Simulator::Now ();
 }
 

@@ -19,6 +19,9 @@
  */
 #include "constant-velocity-mobility-model.h"
 #include "ns3/simulator.h"
+#include "ns3/log.h"
+
+NS_LOG_COMPONENT_DEFINE("ConstantVelocity");
 
 namespace ns3 {
 
@@ -28,8 +31,27 @@ TypeId ConstantVelocityMobilityModel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::ConstantVelocityMobilityModel")
     .SetParent<MobilityModel> ()
+    .AddAttribute ("ConstantVelocity", "The constant velocity for the mobility model.",
+                   VectorValue (Vector (0.0, 0.0, 0.0)),
+                   MakeVectorAccessor (&ConstantVelocityMobilityModel::SetConstantVelocity,
+                                       &ConstantVelocityMobilityModel::GetConstantVelocity),
+                   MakeVectorChecker ())
     .AddConstructor<ConstantVelocityMobilityModel> ();
+
   return tid;
+}
+
+void 
+ConstantVelocityMobilityModel::DoStart(){
+  NS_LOG_FUNCTION("DoStart with velocity"<<DoGetVelocity());
+  DoStartPrivate();
+  MobilityModel::DoStart();
+}
+
+
+void 
+ConstantVelocityMobilityModel::DoStartPrivate(){
+  //SetVelocity(Vector(10, 0, 0));
 }
 
 ConstantVelocityMobilityModel::ConstantVelocityMobilityModel ()
@@ -38,6 +60,19 @@ ConstantVelocityMobilityModel::ConstantVelocityMobilityModel ()
 
 ConstantVelocityMobilityModel::~ConstantVelocityMobilityModel ()
 {
+}
+
+
+void ConstantVelocityMobilityModel::SetConstantVelocity (const Vector &speed){
+  NS_LOG_FUNCTION("Setting velocity to" << speed);
+  SetVelocity(speed);
+}
+
+Vector
+ConstantVelocityMobilityModel::GetConstantVelocity (void) const 
+{
+  NS_LOG_FUNCTION_NOARGS();
+  return DoGetVelocity();
 }
 
 void

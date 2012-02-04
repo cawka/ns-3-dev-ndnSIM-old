@@ -50,10 +50,17 @@ public:
    * Unit is meters/s
    */
   void SetVelocity (const Vector &speed);
+
+  
+  void SetConstantVelocity (const Vector &speed);
+
+  Vector GetConstantVelocity (void) const;
 private:
   virtual Vector DoGetPosition (void) const;
   virtual void DoSetPosition (const Vector &position);
   virtual Vector DoGetVelocity (void) const;
+  void DoStartPrivate();
+  void DoStart();
   void Update (void) const;
   ConstantVelocityHelper m_helper;
 };
