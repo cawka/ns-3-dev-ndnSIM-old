@@ -41,6 +41,7 @@ TypeId ConstantVelocityMobilityModel::GetTypeId (void)
   return tid;
 }
 
+// the Object:Start -> DoStart callchain will be triggered through Simulation::Run()
 void 
 ConstantVelocityMobilityModel::DoStart(){
   NS_LOG_FUNCTION("DoStart with velocity"<<DoGetVelocity());
@@ -51,7 +52,10 @@ ConstantVelocityMobilityModel::DoStart(){
 
 void 
 ConstantVelocityMobilityModel::DoStartPrivate(){
-  //SetVelocity(Vector(10, 0, 0));
+  // We do this to get contineous triggers to the CourseChange function
+  SetVelocity(GetVelocity());
+  Time samplingPositionDelay = Seconds(0.1);
+  Simulator::Schedule(samplingPositionDelay, &ConstantVelocityMobilityModel::DoStartPrivate, this);
 }
 
 ConstantVelocityMobilityModel::ConstantVelocityMobilityModel ()
