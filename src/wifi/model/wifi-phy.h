@@ -412,6 +412,12 @@ public:
   void NotifyRxDrop (Ptr<const Packet> packet);
 
   /**
+    * Public method used to fire a PhyRxDrop trace.  Implemented for encapsulation
+    * purposes.
+    */
+  void NotifyRxInterferenceDrop (Ptr<const Packet> packet);
+
+  /**
    *
    * Public method used to fire a MonitorSniffer trace for a wifi packet being received.  Implemented for encapsulation
    * purposes.
@@ -497,6 +503,13 @@ private:
    * \see class CallBackTraceSource
    */
   TracedCallback<Ptr<const Packet> > m_phyRxDropTrace;
+
+  /**
+   * The trace source fired when the phy layer drops a packet it has received because of interference.
+   *
+   * \see class CallBackTraceSource
+   */
+  TracedCallback<Ptr<const Packet> > m_phyRxDropInterferenceTrace;
 
   /**
    * A trace source that emulates a wifi device in monitor mode

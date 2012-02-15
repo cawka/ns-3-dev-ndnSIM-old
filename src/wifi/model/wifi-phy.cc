@@ -74,6 +74,9 @@ WifiPhy::GetTypeId (void)
     .AddTraceSource ("PhyRxDrop",
                      "Trace source indicating a packet has been dropped by the device during reception",
                      MakeTraceSourceAccessor (&WifiPhy::m_phyRxDropTrace))
+    .AddTraceSource ("PhyRxInteferenceDrop",
+                     "Trace source indicating a packet has been dropped because of inteference by the device during transmission",
+                     MakeTraceSourceAccessor (&WifiPhy::m_phyRxDropInterferenceTrace))
     .AddTraceSource ("MonitorSnifferRx",
                      "Trace source simulating a wifi device in monitor mode sniffing all received frames",
                      MakeTraceSourceAccessor (&WifiPhy::m_phyMonitorSniffRxTrace))
@@ -335,6 +338,12 @@ void
 WifiPhy::NotifyRxDrop (Ptr<const Packet> packet)
 {
   m_phyRxDropTrace (packet);
+}
+
+void
+WifiPhy::NotifyRxInterferenceDrop (Ptr<const Packet> packet)
+{
+  m_phyRxDropInterferenceTrace (packet);
 }
 
 void

@@ -125,6 +125,7 @@ private:
   NiChanges m_niChanges;
   double m_firstPower;
   bool m_rxing;
+    double psr_header_start_after_both(double psr, double & powerW, double & noiseInterferenceW, WifiMode & headerMode, Time & plcpPayloadStart, Time & previous, WifiMode & payloadMode, Time & current) const;
   /// Returns an iterator to the first nichange, which is later than moment
   NiChanges::iterator GetPosition (Time moment);
   void AddNiChangeEvent (NiChange change);

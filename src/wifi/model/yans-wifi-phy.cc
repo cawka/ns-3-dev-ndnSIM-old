@@ -780,6 +780,7 @@ YansWifiPhy::EndReceive (Ptr<Packet> packet, Ptr<InterferenceHelper::Event> even
 
   NS_LOG_DEBUG ("mode=" << (event->GetPayloadMode ().GetDataRate ()) <<
                 ", snr=" << snrPer.snr << ", per=" << snrPer.per << ", size=" << packet->GetSize ());
+  NotifyRxInterferenceDrop(packet);
   if (m_random.GetValue () > snrPer.per)
     {
       NotifyRxEnd (packet);
@@ -794,6 +795,7 @@ YansWifiPhy::EndReceive (Ptr<Packet> packet, Ptr<InterferenceHelper::Event> even
     {
       /* failure. */
       NotifyRxDrop (packet);
+
       m_state->SwitchFromRxEndError (packet, snrPer.snr);
     }
 }
