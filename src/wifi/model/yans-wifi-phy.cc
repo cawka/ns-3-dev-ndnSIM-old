@@ -475,7 +475,6 @@ YansWifiPhy::StartReceivePacket (Ptr<Packet> packet,
           NotifyRxDrop (packet);
           NS_LOG_DEBUG ("drop packet because signal power too Small (" <<
                         rxPowerW << "<" << m_edThresholdW << ")");
-          NotifyRxInterferenceDrop(packet);
           goto maybeCcaBusy;
         }
       break;
@@ -797,7 +796,7 @@ YansWifiPhy::EndReceive (Ptr<Packet> packet, Ptr<InterferenceHelper::Event> even
     {
       /* failure. */
       NotifyRxDrop (packet);
-      NS_LOG_INFO("dropping packet due to noise and error model");
+      NotifyRxInterferenceDrop(packet);
       m_state->SwitchFromRxEndError (packet, snrPer.snr);
     }
 }
