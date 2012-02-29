@@ -125,6 +125,7 @@ def options(opt):
     opt.load('compiler_cxx')
     opt.load('cflags')
     opt.load('gnu_dirs')
+    opt.tool_options('boost', tooldir=["waf-tools"])
 
     opt.add_option('--cwd',
                    help=('Set the working directory for a program.'),
@@ -363,6 +364,14 @@ def configure(conf):
             else:
                 conf.report_optional_feature("static", "Static build", False,
                                              "Link flag -Wl,--whole-archive,-Bstatic does not work")
+
+    try:
+        conf.check_tool('boost')
+        conf.check_boost(lib='signals filesystem iostreams regex')
+        if not conf.env.LIB_BOOST:
+            conf.check_boost(lib='signals filesystem iostreams regex', libpath="/usr/lib64")
+    except WafError:
+        conf.env['LIB_BOOST'] = []
 
     # Set this so that the lists won't be printed at the end of this
     # configure command.
