@@ -2,23 +2,15 @@
 
 import os
 import Options
+import Logs
 from waflib.Errors import WafError
 
 def options(opt):
     opt.add_option('--with-openflow',
 		   help=('Path to OFSID source for NS-3 OpenFlow Integration support'),
 		   default='', dest='with_openflow')
-    opt.tool_options('boost', tooldir=["waf-tools"])
 
 def configure(conf):
-    try:
-        conf.check_tool('boost')
-        conf.check_boost(lib='signals filesystem')
-        if not conf.env.LIB_BOOST:
-            conf.check_boost(lib='signals filesystem', libpath="/usr/lib64")
-    except WafError:
-        conf.env['LIB_BOOST'] = []
-
     if not conf.env.LIB_BOOST:
 	conf.report_optional_feature("openflow", "NS-3 OpenFlow Integration", False,
 				     "Required boost libraries not found")
