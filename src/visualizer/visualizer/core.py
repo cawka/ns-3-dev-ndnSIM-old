@@ -463,6 +463,8 @@ class Visualizer(gobject.GObject):
         self.node_drag_state = None
         self.follow_node = None
         self.shell_window = None
+        self._topology_scan_timeout_id = None
+        self.last_discoverd_node = 0
 
         self.create_gui()
 
@@ -749,10 +751,13 @@ class Visualizer(gobject.GObject):
         self.window.show()
 
     def scan_topology(self):
-        print "scanning topology: %i nodes..." % (ns.network.NodeList.GetNNodes(),)
+        if (self.last_discoverd_node >= ns.network.NodeList.GetNNodes()):
+            return True
+
+        print "scanning topology: [%i, %i) nodes..." % (self.last_discoverd_node, ns.network.NodeList.GetNNodes(),)
         graph = pygraphviz.AGraph()
         seen_nodes = 0
-        for nodeI in range(ns.network.NodeList.GetNNodes()):
+        for nodeI in range(self.last_discoverd_node, ns.network.NodeList.GetNNodes()):
             seen_nodes += 1
             if seen_nodes == 100:
                 print "scan topology... %i nodes visited (%.1f%%)" % (nodeI, 100*nodeI/ns.network.NodeList.GetNNodes())
@@ -762,6 +767,7 @@ class Visualizer(gobject.GObject):
             node_view = self.get_node(nodeI)
 
             mobility = node.GetObject(ns.mobility.MobilityModel.GetTypeId())
+            # print "Mobility type: " + mobility.GetInstanceTypeId().GetName()
             if mobility is not None:
                 node_view.set_color("red")
                 pos = mobility.GetPosition()
@@ -808,7 +814,7 @@ class Visualizer(gobject.GObject):
                                 graph.add_edge(node_name, other_node_name)
                             self.create_link(self.get_node(nodeI), otherNodeView)
 
-        print "scanning topology: calling graphviz layout"
+        # print "scanning topology: calling graphviz layout"
         graph.layout(LAYOUT_ALGORITHM)
         for node in graph.iternodes():
             #print node, "=>", node.attr['pos']
@@ -820,8 +826,11 @@ class Visualizer(gobject.GObject):
                 obj = self.channels[int(node_id)]
             obj.set_position(pos_x, pos_y)
 
-        print "scanning topology: all done."
+        # print "scanning topology: all done."
         self.emit("topology-scanned")
+        
+        self.last_discoverd_node = ns.network.NodeList.GetNNodes();
+        return True
 
     def get_node(self, index):
         try:
@@ -1093,6 +1102,11 @@ class Visualizer(gobject.GObject):
         #print "view: done."
         return True
 
+    def _start_topology_scan(self):
+        if self._topology_scan_timeout_id is not None:
+            gobject.source_remove(self._topology_scan_timeout_id)
+        self._topology_scan_timeout_id = gobject.timeout_add (1000, self.scan_topology, priority=PRIORITY_UPDATE_VIEW)        
+
     def _start_update_timer(self):
         if self._update_timeout_id is not None:
             gobject.source_remove(self._update_timeout_id)
@@ -1171,6 +1185,7 @@ class Visualizer(gobject.GObject):
 
     def start(self):
         self.scan_topology()
+        self._start_topology_scan()
         self.window.connect("delete-event", self._quit)
         #self._start_update_timer()
         gobject.timeout_add(200, self.autoscale_view)
