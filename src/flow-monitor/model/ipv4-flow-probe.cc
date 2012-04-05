@@ -325,8 +325,9 @@ Ipv4FlowProbe::QueueDropLogger (Ptr<const Packet> ipPayload)
   // remove the tags that are added by Ipv4FlowProbe::SendOutgoingLogger ()
 
   // ConstCast: see http://www.nsnam.org/bugzilla/show_bug.cgi?id=904
+  
   Ptr<const Ipv4FlowProbeTag> fTag = ConstCast<Packet> (ipPayload)->RemovePacketTag<Ipv4FlowProbeTag> ();
-  if (!tagFound)
+  if (!fTag)
     {
       return;
     }
