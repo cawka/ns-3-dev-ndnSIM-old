@@ -55,7 +55,7 @@ RocketfuelTopologyReaderTest::DoRun (void)
 
   std::string input ("./src/topology-read/examples/RocketFuel_toposample_1239_weights.txt");
 
-  inFile = CreateObject<RocketfuelTopologyReader> ();
+  inFile = Create<RocketfuelTopologyReader> ();
   inFile->SetFileName (input);
 
   if (inFile != 0)

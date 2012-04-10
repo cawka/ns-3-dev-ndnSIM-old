@@ -391,33 +391,33 @@ PacketTest::DoRun (void)
 
   {
     Packet p;
-    ATestTag<10> a;
+    Ptr< ATestTag<10> > a = CreateObject< ATestTag<10> > ();
     p.AddPacketTag (a);
-    NS_TEST_EXPECT_MSG_EQ (p.PeekPacketTag (a), true, "trivial");
-    ATestTag<11> b;
+    NS_TEST_EXPECT_MSG_NE (p.PeekPacketTag< ATestTag<10> > (),    0, "trivial");
+    Ptr< ATestTag<11> > b = CreateObject< ATestTag<11> > ();
     p.AddPacketTag (b);
-    NS_TEST_EXPECT_MSG_EQ (p.PeekPacketTag (b), true, "trivial");
-    NS_TEST_EXPECT_MSG_EQ (p.PeekPacketTag (a), true, "trivial");
+    NS_TEST_EXPECT_MSG_NE (p.PeekPacketTag< ATestTag<11> > (),    0, "trivial");
+    NS_TEST_EXPECT_MSG_NE (p.PeekPacketTag< ATestTag<10> > (),    0, "trivial");
     Packet copy = p;
-    NS_TEST_EXPECT_MSG_EQ (copy.PeekPacketTag (b), true, "trivial");
-    NS_TEST_EXPECT_MSG_EQ (copy.PeekPacketTag (a), true, "trivial");
-    ATestTag<12> c;
-    NS_TEST_EXPECT_MSG_EQ (copy.PeekPacketTag (c), false, "trivial");
+    NS_TEST_EXPECT_MSG_NE (copy.PeekPacketTag< ATestTag<11> > (), 0, "trivial");
+    NS_TEST_EXPECT_MSG_NE (copy.PeekPacketTag< ATestTag<10> > (), 0, "trivial");
+    Ptr< ATestTag<12> > c = CreateObject< ATestTag<12> > ();
+    NS_TEST_EXPECT_MSG_EQ (copy.PeekPacketTag< ATestTag<12> > (), 0, "trivial");
     copy.AddPacketTag (c);
-    NS_TEST_EXPECT_MSG_EQ (copy.PeekPacketTag (c), true, "trivial");
-    NS_TEST_EXPECT_MSG_EQ (copy.PeekPacketTag (b), true, "trivial");
-    NS_TEST_EXPECT_MSG_EQ (copy.PeekPacketTag (a), true, "trivial");
-    NS_TEST_EXPECT_MSG_EQ (p.PeekPacketTag (c), false, "trivial");
-    copy.RemovePacketTag (b);
-    NS_TEST_EXPECT_MSG_EQ (copy.PeekPacketTag (b), false, "trivial");
-    NS_TEST_EXPECT_MSG_EQ (p.PeekPacketTag (b), true, "trivial");
-    p.RemovePacketTag (a);
-    NS_TEST_EXPECT_MSG_EQ (p.PeekPacketTag (a), false, "trivial");
-    NS_TEST_EXPECT_MSG_EQ (copy.PeekPacketTag (a), true, "trivial");
-    NS_TEST_EXPECT_MSG_EQ (p.PeekPacketTag (c), false, "trivial");
-    NS_TEST_EXPECT_MSG_EQ (copy.PeekPacketTag (c), true, "trivial");
+    NS_TEST_EXPECT_MSG_NE (copy.PeekPacketTag< ATestTag<12> > (), 0, "trivial");
+    NS_TEST_EXPECT_MSG_NE (copy.PeekPacketTag< ATestTag<11> > (), 0, "trivial");
+    NS_TEST_EXPECT_MSG_NE (copy.PeekPacketTag< ATestTag<10> > (), 0, "trivial");
+    NS_TEST_EXPECT_MSG_EQ (p.PeekPacketTag< ATestTag<12> > (),    0, "trivial");
+    copy.RemovePacketTag< ATestTag<11> > ();
+    NS_TEST_EXPECT_MSG_EQ (copy.PeekPacketTag< ATestTag<11> > (), 0, "trivial");
+    NS_TEST_EXPECT_MSG_NE (p.PeekPacketTag< ATestTag<11> > (),    0, "trivial");
+    p.RemovePacketTag< ATestTag<10> > ();
+    NS_TEST_EXPECT_MSG_EQ (p.PeekPacketTag< ATestTag<10> > (),    0, "trivial");
+    NS_TEST_EXPECT_MSG_NE (copy.PeekPacketTag< ATestTag<10> > (), 0, "trivial");
+    NS_TEST_EXPECT_MSG_EQ (p.PeekPacketTag< ATestTag<12> > (),    0, "trivial");
+    NS_TEST_EXPECT_MSG_NE (copy.PeekPacketTag< ATestTag<12> > (), 0, "trivial");
     p.RemoveAllPacketTags ();
-    NS_TEST_EXPECT_MSG_EQ (p.PeekPacketTag (b), false, "trivial");
+    NS_TEST_EXPECT_MSG_EQ (p.PeekPacketTag< ATestTag<11> > (),    0, "trivial");
   }
 
   {

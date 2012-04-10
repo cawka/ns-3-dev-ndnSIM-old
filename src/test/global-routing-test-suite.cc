@@ -76,11 +76,9 @@ DynamicGlobalRoutingTestCase::~DynamicGlobalRoutingTestCase ()
 void
 DynamicGlobalRoutingTestCase::SinkRx (std::string path, Ptr<const Packet> p, const Address& address)
 {
-  Ipv4PacketInfoTag tag;
-  bool found;
-  found = p->PeekPacketTag (tag);
+  Ptr<const Ipv4PacketInfoTag> tag = p->PeekPacketTag<Ipv4PacketInfoTag> ();
   uint8_t now = static_cast<uint8_t> (Simulator::Now ().GetSeconds ());
-  if (found)
+  if (tag != 0)
     {
       ;
     }
@@ -99,17 +97,15 @@ DynamicGlobalRoutingTestCase::HandleRead (Ptr<Socket> socket)
         { //EOF
           break;
         }
-      Ipv4PacketInfoTag tag;
-      bool found;
-      found = packet->PeekPacketTag (tag);
+      Ptr<const Ipv4PacketInfoTag> tag = packet->PeekPacketTag<Ipv4PacketInfoTag> ();
       uint8_t now = static_cast<uint8_t> (Simulator::Now ().GetSeconds ());
-      if (found)
+      if (tag != 0)
         {
-          if (tag.GetRecvIf () == 1)
+          if (tag->GetRecvIf () == 1)
             {
               m_firstInterface[now]++;
             }
-          if (tag.GetRecvIf () == 2)
+          if (tag->GetRecvIf () == 2)
             {
               m_secondInterface[now]++;
             }

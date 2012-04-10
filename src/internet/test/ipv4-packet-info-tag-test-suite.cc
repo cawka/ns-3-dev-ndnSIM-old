@@ -97,10 +97,8 @@ Ipv4PacketInfoTagTest::RxCb (Ptr<Socket> socket)
   m_receivedPacket = socket->Recv (std::numeric_limits<uint32_t>::max (), 0);
   NS_TEST_ASSERT_MSG_EQ (availableData, m_receivedPacket->GetSize (), "Did not read expected data");
 
-  Ipv4PacketInfoTag tag;
-  bool found;
-  found = m_receivedPacket->RemovePacketTag (tag);
-  NS_TEST_ASSERT_MSG_EQ (found, true, "Could not find tag");
+  Ptr<const Ipv4PacketInfoTag> tag = m_receivedPacket->RemovePacketTag<Ipv4PacketInfoTag> ();
+  NS_TEST_ASSERT_MSG_NE (tag, 0, "Could not find tag");
 }
 
 void
