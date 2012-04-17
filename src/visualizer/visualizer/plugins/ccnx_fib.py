@@ -49,7 +49,7 @@ class ShowCcnxFib(InformationWindow):
         treeview.append_column(column)
 
         # Interface
-        column = gtk.TreeViewColumn('Face(metric,status)', gtk.CellRendererText(),
+        column = gtk.TreeViewColumn('faceType[nodeId](routingCost,status,metric)', gtk.CellRendererText(),
                                     text=self.COLUMN_FACE)
         treeview.append_column(column)
 
