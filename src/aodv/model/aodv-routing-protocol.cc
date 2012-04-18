@@ -352,9 +352,9 @@ RoutingProtocol::RouteOutput (Ptr<Packet> p, const Ipv4Header &header,
   // Actual route request will be deferred until packet will be fully formed, 
   // routed to loopback, received from loopback and passed to RouteInput (see below)
   uint32_t iif = (oif ? m_ipv4->GetInterfaceForDevice (oif) : -1);
-  DeferredRouteOutputTag tag (iif);
-  if (!p->PeekPacketTag (tag))
+  if (p->PeekPacketTag<DeferredRouteOutputTag> () == 0)
     {
+      Ptr<DeferredRouteOutputTag> tag = CreateObject<DeferredRouteOutputTag> (iif);
       p->AddPacketTag (tag);
     }
   return LoopbackRoute (header, oif);
@@ -405,8 +405,7 @@ RoutingProtocol::RouteInput (Ptr<const Packet> p, const Ipv4Header &header,
   // Deferred route request
   if (idev == m_lo)
     {
-      DeferredRouteOutputTag tag;
-      if (p->PeekPacketTag (tag))
+      if (p->PeekPacketTag<DeferredRouteOutputTag> () != 0)
         {
           DeferredRouteOutput (p, header, ucb, ecb);
           return true;
@@ -1594,11 +1593,11 @@ RoutingProtocol::SendPacketFromQueue (Ipv4Address dst, Ptr<Ipv4Route> route)
   QueueEntry queueEntry;
   while (m_queue.Dequeue (dst, queueEntry))
     {
-      DeferredRouteOutputTag tag;
       Ptr<Packet> p = ConstCast<Packet> (queueEntry.GetPacket ());
-      if (p->RemovePacketTag (tag) && 
-          tag.GetInterface() != -1 &&
-          tag.GetInterface() != m_ipv4->GetInterfaceForDevice (route->GetOutputDevice ()))
+      Ptr<const DeferredRouteOutputTag> tag = p->RemovePacketTag<DeferredRouteOutputTag> ();
+      if (tag != 0 && 
+          tag->GetInterface() != -1 && 
+          tag->GetInterface() != m_ipv4->GetInterfaceForDevice (route->GetOutputDevice ()))
         {
           NS_LOG_DEBUG ("Output device doesn't match. Dropped.");
           return;

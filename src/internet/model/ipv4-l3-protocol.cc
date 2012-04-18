@@ -547,11 +547,10 @@ Ipv4L3Protocol::Send (Ptr<Packet> packet,
   Ipv4Header ipHeader;
   bool mayFragment = true;
   uint8_t ttl = m_defaultTtl;
-  SocketIpTtlTag tag;
-  bool found = packet->RemovePacketTag (tag);
-  if (found)
+  Ptr<const SocketIpTtlTag> tag = packet->RemovePacketTag<SocketIpTtlTag> ();
+  if (tag != 0)
     {
-      ttl = tag.GetTtl ();
+      ttl = tag->GetTtl ();
     }
 
   // Handle a few cases:

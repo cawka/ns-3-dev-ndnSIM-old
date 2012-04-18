@@ -386,8 +386,8 @@ PacketSocket::ForwardUp (Ptr<NetDevice> device, Ptr<const Packet> packet,
   if ((m_rxAvailable + packet->GetSize ()) <= m_rcvBufSize)
     {
       Ptr<Packet> copy = packet->Copy ();
-      SocketAddressTag tag;
-      tag.SetAddress (address);
+      Ptr<SocketAddressTag> tag = Create<SocketAddressTag> ();
+      tag->SetAddress (address);
       copy->AddPacketTag (tag);
       m_deliveryQueue.push (copy);
       m_rxAvailable += packet->GetSize ();
@@ -443,11 +443,9 @@ PacketSocket::RecvFrom (uint32_t maxSize, uint32_t flags, Address &fromAddress)
   Ptr<Packet> packet = Recv (maxSize, flags);
   if (packet != 0)
     {
-      SocketAddressTag tag;
-      bool found;
-      found = packet->PeekPacketTag (tag);
-      NS_ASSERT (found);
-      fromAddress = tag.GetAddress ();
+      Ptr<const SocketAddressTag> tag = packet->PeekPacketTag<SocketAddressTag> ();
+      NS_ASSERT (tag != 0);
+      fromAddress = tag->GetAddress ();
     }
   return packet;
 }

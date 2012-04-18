@@ -55,8 +55,7 @@ HwmpProtocolMac::ReceiveData (Ptr<Packet> packet, const WifiMacHeader & header)
   NS_ASSERT (header.IsData ());
 
   MeshHeader meshHdr;
-  HwmpTag tag;
-  if (packet->PeekPacketTag (tag))
+  if (packet->PeekPacketTag<HwmpTag> () != 0)
     {
       NS_FATAL_ERROR ("HWMP tag is not supposed to be received by network");
     }
@@ -78,8 +77,9 @@ HwmpProtocolMac::ReceiveData (Ptr<Packet> packet, const WifiMacHeader & header)
       NS_FATAL_ERROR (
         "6-address scheme is not yet supported and 4-address extension is not supposed to be used for data frames.");
     }
-  tag.SetSeqno (meshHdr.GetMeshSeqno ());
-  tag.SetTtl (meshHdr.GetMeshTtl ());
+  Ptr<HwmpTag> tag = CreateObject<HwmpTag> ();
+  tag->SetSeqno (meshHdr.GetMeshSeqno ());
+  tag->SetTtl (meshHdr.GetMeshTtl ());
   packet->AddPacketTag (tag);
 
   if ((destination == Mac48Address::GetBroadcast ()) && (m_protocol->DropDataFrame (meshHdr.GetMeshSeqno (),
@@ -188,19 +188,18 @@ HwmpProtocolMac::UpdateOutcomingFrame (Ptr<Packet> packet, WifiMacHeader & heade
     {
       return true;
     }
-  HwmpTag tag;
-  bool tagExists = packet->RemovePacketTag (tag);
-  if (!tagExists)
+  Ptr<const HwmpTag> tag = packet->RemovePacketTag<HwmpTag> ();
+  if (tag == 0)
     {
       NS_FATAL_ERROR ("HWMP tag must exist at this point");
     }
   m_stats.txData++;
   m_stats.txDataBytes += packet->GetSize ();
   MeshHeader meshHdr;
-  meshHdr.SetMeshSeqno (tag.GetSeqno ());
-  meshHdr.SetMeshTtl (tag.GetTtl ());
+  meshHdr.SetMeshSeqno (tag->GetSeqno ());
+  meshHdr.SetMeshTtl (tag->GetTtl ());
   packet->AddHeader (meshHdr);
-  header.SetAddr1 (tag.GetAddress ());
+  header.SetAddr1 (tag->GetAddress ());
   return true;
 }
 WifiActionHeader

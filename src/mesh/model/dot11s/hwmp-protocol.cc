@@ -233,29 +233,32 @@ HwmpProtocol::RequestRoute (
   )
 {
   Ptr <Packet> packet = constPacket->Copy ();
-  HwmpTag tag;
+  Ptr<HwmpTag> tag = 0;
   if (sourceIface == GetMeshPoint ()->GetIfIndex ())
     {
       // packet from level 3
-      if (packet->PeekPacketTag (tag))
+      if (packet->PeekPacketTag<HwmpTag> () != 0)
         {
           NS_FATAL_ERROR ("HWMP tag has come with a packet from upper layer. This must not occur...");
         }
+      tag = CreateObject<HwmpTag> ();
       //Filling TAG:
       if (destination == Mac48Address::GetBroadcast ())
         {
-          tag.SetSeqno (m_dataSeqno++);
+          tag->SetSeqno (m_dataSeqno++);
         }
-      tag.SetTtl (m_maxTtl);
+      tag->SetTtl (m_maxTtl);
     }
   else
     {
-      if (!packet->RemovePacketTag (tag))
+      Ptr<const HwmpTag> origTag = packet->RemovePacketTag<HwmpTag> ();
+      if (!packet->RemovePacketTag<HwmpTag> ())
         {
           NS_FATAL_ERROR ("HWMP tag is supposed to be here at this point.");
         }
-      tag.DecrementTtl ();
-      if (tag.GetTtl () == 0)
+      tag = CreateObject<HwmpTag> (*origTag);
+      tag->DecrementTtl ();
+      if (tag->GetTtl () == 0)
         {
           m_stats.droppedTtl++;
           return false;
@@ -287,11 +290,11 @@ HwmpProtocol::RequestRoute (
             {
               Ptr<Packet> packetCopy = packet->Copy ();
               //
-              // 64-bit Intel valgrind complains about tag.SetAddress (*i).  It
+              // 64-bit Intel valgrind complains about tag->SetAddress (*i).  It
               // likes this just fine.
               //
               Mac48Address address = *i;
-              tag.SetAddress (address);
+              tag->SetAddress (address);
               packetCopy->AddPacketTag (tag);
               routeReply (true, packetCopy, source, destination, protocolType, plugin->first);
             }
@@ -299,7 +302,7 @@ HwmpProtocol::RequestRoute (
     }
   else
     {
-      return ForwardUnicast (sourceIface, source, destination, packet, protocolType, routeReply, tag.GetTtl ());
+      return ForwardUnicast (sourceIface, source, destination, packet, protocolType, routeReply, tag->GetTtl ());
     }
   return true;
 }
@@ -307,8 +310,8 @@ bool
 HwmpProtocol::RemoveRoutingStuff (uint32_t fromIface, const Mac48Address source,
                                   const Mac48Address destination, Ptr<Packet>  packet, uint16_t&  protocolType)
 {
-  HwmpTag tag;
-  if (!packet->RemovePacketTag (tag))
+  Ptr<const HwmpTag> tag = packet->RemovePacketTag<HwmpTag> ();
+  if (tag == 0)
     {
       NS_FATAL_ERROR ("HWMP tag must exist when packet received from the network");
     }
@@ -325,9 +328,9 @@ HwmpProtocol::ForwardUnicast (uint32_t  sourceIface, const Mac48Address source, 
     {
       result = m_rtable->LookupProactive ();
     }
-  HwmpTag tag;
-  tag.SetAddress (result.retransmitter);
-  tag.SetTtl (ttl);
+  Ptr<HwmpTag> tag = CreateObject<HwmpTag> ();
+  tag->SetAddress (result.retransmitter);
+  tag->SetTtl (ttl);
   //seqno and metric is not used;
   packet->AddPacketTag (tag);
   if (result.retransmitter != Mac48Address::GetBroadcast ())
@@ -921,9 +924,13 @@ HwmpProtocol::ReactivePathResolved (Mac48Address dst)
   while (packet.pkt != 0)
     {
       //set RA tag for retransmitter:
-      HwmpTag tag;
-      packet.pkt->RemovePacketTag (tag);
-      tag.SetAddress (result.retransmitter);
+      Ptr<const HwmpTag> origTag = packet.pkt->RemovePacketTag<HwmpTag> ();
+      if (origTag == 0)
+        {
+          NS_FATAL_ERROR ("HWMP tag must be present at this point");
+        }
+      Ptr<HwmpTag> tag = CreateObject<HwmpTag> (*origTag);
+      tag->SetAddress (result.retransmitter);
       packet.pkt->AddPacketTag (tag);
       m_stats.txUnicast++;
       m_stats.txBytes += packet.pkt->GetSize ();
@@ -942,12 +949,13 @@ HwmpProtocol::ProactivePathResolved ()
   while (packet.pkt != 0)
     {
       //set RA tag for retransmitter:
-      HwmpTag tag;
-      if (!packet.pkt->RemovePacketTag (tag))
+      Ptr<const HwmpTag> origTag = packet.pkt->RemovePacketTag<HwmpTag> ();
+      if (origTag == 0)
         {
           NS_FATAL_ERROR ("HWMP tag must be present at this point");
         }
-      tag.SetAddress (result.retransmitter);
+      Ptr<HwmpTag> tag = CreateObject<HwmpTag> (*origTag);
+      tag->SetAddress (result.retransmitter);
       packet.pkt->AddPacketTag (tag);
       m_stats.txUnicast++;
       m_stats.txBytes += packet.pkt->GetSize ();

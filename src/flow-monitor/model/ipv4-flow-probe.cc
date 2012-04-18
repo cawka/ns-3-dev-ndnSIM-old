@@ -204,8 +204,8 @@ Ipv4FlowProbe::SendOutgoingLogger (const Ipv4Header &ipHeader, Ptr<const Packet>
 
       // tag the packet with the flow id and packet id, so that the packet can be identified even
       // when Ipv4Header is not accessible at some non-IPv4 protocol layer
-      Ipv4FlowProbeTag fTag (flowId, packetId, size);
-      ipPayload->AddPacketTag (fTag);
+      Ptr<Ipv4FlowProbeTag> fTag = CreateObject<Ipv4FlowProbeTag> (flowId, packetId, size);
+      ConstCast<Packet> (ipPayload)->AddPacketTag (fTag);
     }
 }
 
@@ -233,10 +233,9 @@ Ipv4FlowProbe::ForwardUpLogger (const Ipv4Header &ipHeader, Ptr<const Packet> ip
   if (m_classifier->Classify (ipHeader, ipPayload, &flowId, &packetId))
     {
       // remove the tags that are added by Ipv4FlowProbe::SendOutgoingLogger ()
-      Ipv4FlowProbeTag fTag;
 
       // ConstCast: see http://www.nsnam.org/bugzilla/show_bug.cgi?id=904
-      ConstCast<Packet> (ipPayload)->RemovePacketTag (fTag);
+      ConstCast<Packet> (ipPayload)->RemovePacketTag<Ipv4FlowProbeTag> ();
 
       uint32_t size = (ipPayload->GetSize () + ipHeader.GetSerializedSize ());
       NS_LOG_DEBUG ("ReportLastRx ("<<this<<", "<<flowId<<", "<<packetId<<", "<<size<<");");
@@ -272,10 +271,9 @@ Ipv4FlowProbe::DropLogger (const Ipv4Header &ipHeader, Ptr<const Packet> ipPaylo
   if (m_classifier->Classify (ipHeader, ipPayload, &flowId, &packetId))
     {
       // remove the tags that are added by Ipv4FlowProbe::SendOutgoingLogger ()
-      Ipv4FlowProbeTag fTag;
 
       // ConstCast: see http://www.nsnam.org/bugzilla/show_bug.cgi?id=904
-      ConstCast<Packet> (ipPayload)->RemovePacketTag (fTag);
+      ConstCast<Packet> (ipPayload)->RemovePacketTag<Ipv4FlowProbeTag> ();
 
       uint32_t size = (ipPayload->GetSize () + ipHeader.GetSerializedSize ());
       NS_LOG_DEBUG ("Drop ("<<this<<", "<<flowId<<", "<<packetId<<", "<<size<<", " << reason 
@@ -325,19 +323,17 @@ void
 Ipv4FlowProbe::QueueDropLogger (Ptr<const Packet> ipPayload)
 {
   // remove the tags that are added by Ipv4FlowProbe::SendOutgoingLogger ()
-  Ipv4FlowProbeTag fTag;
 
   // ConstCast: see http://www.nsnam.org/bugzilla/show_bug.cgi?id=904
-  bool tagFound;
-  tagFound = ConstCast<Packet> (ipPayload)->RemovePacketTag (fTag);
+  Ptr<const Ipv4FlowProbeTag> fTag = ConstCast<Packet> (ipPayload)->RemovePacketTag<Ipv4FlowProbeTag> ();
   if (!tagFound)
     {
       return;
     }
 
-  FlowId flowId = fTag.GetFlowId ();
-  FlowPacketId packetId = fTag.GetPacketId ();
-  uint32_t size = fTag.GetPacketSize ();
+  FlowId flowId = fTag->GetFlowId ();
+  FlowPacketId packetId = fTag->GetPacketId ();
+  uint32_t size = fTag->GetPacketSize ();
 
   NS_LOG_DEBUG ("Drop ("<<this<<", "<<flowId<<", "<<packetId<<", "<<size<<", " << DROP_QUEUE 
                         << "); ");

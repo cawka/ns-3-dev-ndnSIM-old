@@ -320,9 +320,10 @@ Ipv4RawSocketImpl::ForwardUp (Ptr<const Packet> p, Ipv4Header ipHeader, Ptr<Ipv4
       // Should check via getsockopt ()..
       if (IsRecvPktInfo ())
         {
-          Ipv4PacketInfoTag tag;
-          copy->RemovePacketTag (tag);
-          tag.SetRecvIf (incomingInterface->GetDevice ()->GetIfIndex ());
+          Ptr<const Ipv4PacketInfoTag> origTag = copy->RemovePacketTag<Ipv4PacketInfoTag> ();
+          NS_ASSERT (origTag != 0);
+          Ptr<Ipv4PacketInfoTag> tag = CreateObject<Ipv4PacketInfoTag> (*origTag);
+          tag->SetRecvIf (incomingInterface->GetDevice ()->GetIfIndex ());
           copy->AddPacketTag (tag);
         }
       if (m_protocol == 1)

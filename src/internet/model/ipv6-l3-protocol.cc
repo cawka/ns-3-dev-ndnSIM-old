@@ -610,12 +610,11 @@ void Ipv6L3Protocol::Send (Ptr<Packet> packet, Ipv6Address source, Ipv6Address d
   NS_LOG_FUNCTION (this << packet << source << destination << (uint32_t)protocol << route);
   Ipv6Header hdr;
   uint8_t ttl = m_defaultTtl;
-  SocketIpTtlTag tag;
-  bool found = packet->RemovePacketTag (tag);
+  Ptr<const SocketIpTtlTag> tag = packet->RemovePacketTag<SocketIpTtlTag> ();
 
-  if (found)
+  if (tag != 0)
     {
-      ttl = tag.GetTtl ();
+      ttl = tag->GetTtl ();
     }
 
   /* Handle 3 cases:

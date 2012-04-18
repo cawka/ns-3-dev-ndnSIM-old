@@ -47,14 +47,14 @@ FlameProtocolMac::Receive (Ptr<Packet> packet, const WifiMacHeader & header)
     {
       return true;
     }
-  FlameTag tag;
-  if (packet->PeekPacketTag (tag))
+  if (packet->PeekPacketTag<FlameTag> () != 0)
     {
       NS_FATAL_ERROR ("FLAME tag is not supposed to be received by network");
     }
-  tag.receiver = header.GetAddr1 ();
-  tag.transmitter = header.GetAddr2 ();
-  if (tag.receiver == Mac48Address::GetBroadcast ())
+  Ptr<FlameTag> tag = CreateObject<FlameTag> ();
+  tag->receiver = header.GetAddr1 ();
+  tag->transmitter = header.GetAddr2 ();
+  if (tag->receiver == Mac48Address::GetBroadcast ())
     {
       m_stats.rxBroadcast++;
     }
@@ -74,13 +74,13 @@ FlameProtocolMac::UpdateOutcomingFrame (Ptr<Packet> packet, WifiMacHeader & head
     {
       return true;
     }
-  FlameTag tag;
-  if (!packet->RemovePacketTag (tag))
+  Ptr<const FlameTag> tag = packet->RemovePacketTag<FlameTag> ();
+  if (tag == 0)
     {
       NS_FATAL_ERROR ("FLAME tag must exist here");
     }
-  header.SetAddr1 (tag.receiver);
-  if (tag.receiver == Mac48Address::GetBroadcast ())
+  header.SetAddr1 (tag->receiver);
+  if (tag->receiver == Mac48Address::GetBroadcast ())
     {
       m_stats.txBroadcast++;
     }
