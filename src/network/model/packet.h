@@ -106,53 +106,6 @@ private:
 
 /**
  * \ingroup packet
- * \brief Iterator over the set of 'packet' tags in a packet
- *
- * This is a java-style iterator.
- */
-class PacketTagIterator
-{
-public:
-  /**
-   * Identifies a tag within a packet.
-   */
-  class Item 
-  {
-public:
-    /**
-     * \returns the ns3::TypeId associated to this tag.
-     */
-    TypeId GetTypeId (void) const;
-    /**
-     * \param tag the user tag to which the data should be copied.
-     *
-     * Read the requested tag and store it in the user-provided
-     * tag instance. This method will crash if the type of the
-     * tag provided by the user does not match the type of
-     * the underlying tag.
-     */
-    void GetTag (Tag &tag) const;
-private:
-    friend class PacketTagIterator;
-    Item (const struct PacketTagList::TagData *data);
-    const struct PacketTagList::TagData *m_data;
-  };
-  /**
-   * \returns true if calling Next is safe, false otherwise.
-   */
-  bool HasNext (void) const;
-  /**
-   * \returns the next item found and prepare for the next one.
-   */
-  Item Next (void);
-private:
-  friend class Packet;
-  PacketTagIterator (const struct PacketTagList::TagData *head);
-  const struct PacketTagList::TagData *m_current;
-};
-
-/**
- * \ingroup packet
  * \brief network packets
  *
  * Each network packet contains a byte buffer, a set of byte tags, a set of
@@ -498,31 +451,63 @@ public:
   /**
    * \param tag the tag to store in this packet
    *
-   * Add a tag to this packet. This method calls the
-   * Tag::GetSerializedSize and, then, Tag::Serialize.
-   *
-   * Note that this method is const, that is, it does not
-   * modify the state of this packet, which is fairly
-   * un-intuitive.
+   * Add a tag to this packet.
    */
-  void AddPacketTag (const Tag &tag) const;
+  void
+  AddPacketTag (Ptr<const Tag> tag);
+
   /**
    * \param tag the tag to remove from this packet
-   * \returns true if the requested tag is found, false
-   *          otherwise.
+   * \returns smart pointer to a constant Tag object if the requested tag is found, 
+   *          0 otherwise.
    *
-   * Remove a tag from this packet. This method calls
-   * Tag::Deserialize if the tag is found.
+   * Remove a tag from this packet. 
    */
-  bool RemovePacketTag (Tag &tag);
+  Ptr<const Tag>
+  RemovePacketTag (TypeId tagType);
+
+  /**
+   * \param tag the tag to remove from this packet
+   * \returns smart pointer to a constant Tag object if the requested tag is found, 
+   *          0 otherwise.
+   *
+   * Templated version to remove a tag from this packet.
+   * In addition to non-templated version, there is a DynamicCast to
+   * the requested tag type
+   */
+  template<class T>
+  Ptr<const T>
+  RemovePacketTag ()
+  {
+    return DynamicCast<const T> (RemovePacketTag (T::GetTypeId ()));
+  }
+  
   /**
    * \param tag the tag to search in this packet
    * \returns true if the requested tag is found, false
    *          otherwise.
    *
-   * Search a matching tag and call Tag::Deserialize if it is found.
+   * Search a matching tag and return it if found
    */
-  bool PeekPacketTag (Tag &tag) const;
+  Ptr<const Tag>
+  PeekPacketTag (TypeId tagType) const;
+
+  /**
+   * \param tag the tag to search in this packet
+   * \returns true if the requested tag is found, false
+   *          otherwise.
+   *
+   * Templated version of search for a matching tag and returning it if found
+   * In addition to non-templated version, there is a DynamicCast to
+   * the requested tag type
+   */
+  template<class T>
+  Ptr<const T>
+  PeekPacketTag () const
+  {
+    return DynamicCast<const T> (PeekPacketTag (T::GetTypeId ()));
+  }
+  
   /**
    * Remove all packet tags.
    */
@@ -542,7 +527,7 @@ public:
    * \returns an object which can be used to iterate over the list of
    *  packet tags.
    */
-  PacketTagIterator GetPacketTagIterator (void) const;
+  // PacketTagIterator GetPacketTagIterator (void) const;
 
   /* Note: These functions support a temporary solution 
    * to a specific problem in this generic class, i.e. 

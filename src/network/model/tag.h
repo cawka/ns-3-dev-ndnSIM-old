@@ -20,7 +20,7 @@
 #ifndef TAG_H
 #define TAG_H
 
-#include "ns3/object-base.h"
+#include "ns3/object.h"
 #include "tag-buffer.h"
 #include <stdint.h>
 
@@ -33,7 +33,7 @@ namespace ns3 {
  *
  * New kinds of tags can be created by subclassing this base class.
  */
-class Tag : public ObjectBase
+class Tag : public Object
 {
 public:
   static TypeId GetTypeId (void);
@@ -70,6 +70,13 @@ public:
    */
   virtual void Print (std::ostream &os) const = 0;
 };
+
+inline std::ostream &
+operator << (std::ostream &os, const Tag &tag)
+{
+  tag.Print (os);
+  return os;
+}
 
 } // namespace ns3
 
