@@ -708,7 +708,9 @@ void AnimationInterface::WriteNonP2pLinkProperties (uint32_t id, std::string ipv
   WriteN (oss.str ());
 }
 
-void AnimationInterface::DevTxTrace (std::string context, Ptr<const Packet> p,
+void AnimationInterface::DevTxTrace (std::string context, 
+                                     uint32_t channel,
+                                     Ptr<const Packet> p,
                                      Ptr<NetDevice> tx, Ptr<NetDevice> rx,
                                      Time txTime, Time rxTime)
 {
