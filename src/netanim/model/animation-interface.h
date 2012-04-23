@@ -264,7 +264,8 @@ private:
   std::string m_originalFileName;
 
   void DevTxTrace (std::string context,
-                   Ptr<const Packet> p,
+                   uint32_t,
+		   Ptr<const Packet> p,
                    Ptr<NetDevice> tx,
                    Ptr<NetDevice> rx,
                    Time txTime,
