@@ -688,7 +688,9 @@ void AnimationInterface::WriteDummyPacket ()
 
 
 }
-void AnimationInterface::DevTxTrace (std::string context, Ptr<const Packet> p,
+void AnimationInterface::DevTxTrace (std::string context,
+                                     uint32_t, // channel
+                                     Ptr<const Packet> p,
                                      Ptr<NetDevice> tx, Ptr<NetDevice> rx,
                                      Time txTime, Time rxTime)
 {

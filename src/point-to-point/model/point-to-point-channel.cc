@@ -98,7 +98,7 @@ PointToPointChannel::TransmitStart (
                                   m_link[wire].m_dst, p);
 
   // Call the tx anim callback on the net device
-  m_txrxPointToPoint (p, src, m_link[wire].m_dst, txTime, txTime + m_delay);
+  m_txrxPointToPoint (GetId (), p, src, m_link[wire].m_dst, txTime, txTime + m_delay);
   return true;
 }
 

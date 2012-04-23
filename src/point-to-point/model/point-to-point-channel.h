@@ -137,7 +137,8 @@ private:
    *
    * @see class CallBackTraceSource
    */
-  TracedCallback<Ptr<const Packet>, // Packet being transmitted
+  TracedCallback<uint32_t,          // channel ID
+                 Ptr<const Packet>, // Packet being transmitted
                  Ptr<NetDevice>,    // Transmitting NetDevice
                  Ptr<NetDevice>,    // Receiving NetDevice
                  Time,              // Amount of time to transmit the pkt
