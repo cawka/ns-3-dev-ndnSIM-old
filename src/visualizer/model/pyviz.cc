@@ -317,8 +317,9 @@ PyViz::SimulatorRunUntil (Time time)
   // events just appear to "jump" big chunks of time.
   NS_LOG_LOGIC ("Schedule dummy callback to be called in " << (time - Simulator::Now ()));
   m_stop = false;
-  Simulator::Cancel (m_stopCallbackEvent);
-  m_stopCallbackEvent = Simulator::Schedule (time - Simulator::Now (), &PyViz::CallbackStopSimulation, this);
+  // Simulator::Cancel (m_stopCallbackEvent);
+  // m_stopCallbackEvent =
+  Simulator::ScheduleWithContext (-1, time - Simulator::Now (), &PyViz::CallbackStopSimulation, this);
 
   Ptr<SimulatorImpl> impl = Simulator::GetImplementation ();
   Ptr<VisualSimulatorImpl> visualImpl = DynamicCast<VisualSimulatorImpl> (impl);

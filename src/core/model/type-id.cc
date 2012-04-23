@@ -149,7 +149,8 @@ IidManager::AddConstructor (uint16_t uid, ns3::Callback<ns3::ObjectBase *> callb
   struct IidInformation *information = LookupInformation (uid);
   if (information->hasConstructor)
     {
-      NS_FATAL_ERROR (information->name<<" already has a constructor.");
+      return;
+      // NS_FATAL_ERROR (information->name<<" already has a constructor.");
     }
   information->hasConstructor = true;
   information->constructor = callback;
