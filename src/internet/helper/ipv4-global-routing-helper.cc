@@ -23,6 +23,7 @@
 #include "ns3/ipv4-global-routing-one-nexthop.h"
 #include "ns3/ipv4-list-routing.h"
 #include "ns3/log.h"
+#include "ns3/node-list.h"
 
 NS_LOG_COMPONENT_DEFINE ("GlobalRoutingHelper");
 
