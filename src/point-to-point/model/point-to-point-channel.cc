@@ -19,11 +19,15 @@
 #include "point-to-point-channel.h"
 #include "point-to-point-net-device.h"
 #include "ns3/trace-source-accessor.h"
+#include "ns3/point-to-point-loss-model.h"
 #include "ns3/packet.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
+#include "ns3/pointer.h"
 
 NS_LOG_COMPONENT_DEFINE ("PointToPointChannel");
+
+#include "type-tag.h"
 
 namespace ns3 {
 
@@ -39,9 +43,16 @@ PointToPointChannel::GetTypeId (void)
                    TimeValue (Seconds (0)),
                    MakeTimeAccessor (&PointToPointChannel::m_delay),
                    MakeTimeChecker ())
+    .AddAttribute ("LossModel", "Loss model",
+                   PointerValue (0),
+                   MakePointerAccessor (&PointToPointChannel::m_loss),
+                   MakePointerChecker<PointToPointLossModel> ())
     .AddTraceSource ("TxRxPointToPoint",
                      "Trace source indicating transmission of packet from the PointToPointChannel, used by the Animation interface.",
                      MakeTraceSourceAccessor (&PointToPointChannel::m_txrxPointToPoint))
+    .AddTraceSource ("DropPointToPoint",
+                     "Trace source indicating dropping of packets in the PointToPointChannel.",
+                     MakeTraceSourceAccessor (&PointToPointChannel::m_dropPointToPoint))
   ;
   return tid;
 }
@@ -56,6 +67,10 @@ PointToPointChannel::PointToPointChannel()
     m_nDevices (0)
 {
   NS_LOG_FUNCTION_NOARGS ();
+}
+
+PointToPointChannel::~PointToPointChannel ()
+{
 }
 
 void
@@ -93,6 +108,21 @@ PointToPointChannel::TransmitStart (
 
   uint32_t wire = src == m_link[0].m_src ? 0 : 1;
 
+  Ptr<const TypeTag> tag = p->PeekPacketTag<TypeTag> ();
+  // NS_LOG_DEBUG ("Packet tag is: " << tag);  
+
+  // if (tag != 0 && tag->GetType () == TypeTag::DATA)
+  //   {
+  //     if (m_loss != 0 && m_loss->IsLoss (p))
+  //       {
+  //         // drop packet
+  //         m_dropPointToPoint (GetId (), p, src, m_link[wire].m_dst, txTime, txTime + m_delay);
+      
+  //         return false;
+  //       }
+  //   }
+  // continue normal operations
+  
   Simulator::ScheduleWithContext (m_link[wire].m_dst->GetNode ()->GetId (),
                                   txTime + m_delay, &PointToPointNetDevice::Receive,
                                   m_link[wire].m_dst, p);
