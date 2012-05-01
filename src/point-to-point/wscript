@@ -7,6 +7,7 @@ def build(bld):
         'model/point-to-point-net-device.cc',
         'model/point-to-point-channel.cc',
         'model/point-to-point-remote-channel.cc',
+        'model/point-to-point-loss-model.cc',
         'model/ppp-header.cc',
         'helper/point-to-point-helper.cc',
         ]
@@ -22,6 +23,7 @@ def build(bld):
         'model/point-to-point-net-device.h',
         'model/point-to-point-channel.h',
         'model/point-to-point-remote-channel.h',
+        'model/point-to-point-loss-model.h',
         'model/ppp-header.h',
         'helper/point-to-point-helper.h',
         ]
