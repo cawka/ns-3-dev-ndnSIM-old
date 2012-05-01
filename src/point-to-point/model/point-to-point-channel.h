@@ -30,6 +30,7 @@ namespace ns3 {
 
 class PointToPointNetDevice;
 class Packet;
+class PointToPointLossModel;
 
 /**
  * \ingroup point-to-point
@@ -56,6 +57,11 @@ public:
    * has zero transmission delay.
    */
   PointToPointChannel ();
+
+  /**
+   * \brief Destructor
+   */
+  ~PointToPointChannel ();
 
   /**
    * \brief Attach a given netdevice to this channel
@@ -128,6 +134,7 @@ private:
   Time          m_delay;
   int32_t       m_nDevices;
 
+  Ptr<PointToPointLossModel> m_loss;
   /**
    * The trace source for the packet transmission animation events that the 
    * device can fire.
@@ -145,6 +152,14 @@ private:
                  Time               // Last bit receive time (relative to now)
                  > m_txrxPointToPoint;
 
+  TracedCallback<uint32_t,          // channel ID
+                 Ptr<const Packet>, // Packet being transmitted
+                 Ptr<NetDevice>,    // Transmitting NetDevice
+                 Ptr<NetDevice>,    // Receiving NetDevice
+                 Time,              // Amount of time to transmit the pkt
+                 Time               // Last bit receive time (relative to now)
+                 > m_dropPointToPoint;
+  
   enum WireState
   {
     INITIALIZING,
