@@ -61,6 +61,12 @@ RttEstimator::GetTypeId (void)
                    MakeTimeAccessor (&RttEstimator::SetMinRto,
                                      &RttEstimator::GetMinRto),
                    MakeTimeChecker ())
+    .AddAttribute ("MaxRTO",
+                   "Maximum retransmit timeout value",
+                   TimeValue (Seconds (200.0)),
+                   MakeTimeAccessor (&RttEstimator::SetMaxRto,
+                                     &RttEstimator::GetMaxRto),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -76,6 +82,19 @@ RttEstimator::GetMinRto (void) const
 {
   return m_minRto;
 }
+
+void 
+RttEstimator::SetMaxRto (Time maxRto)
+{
+  NS_LOG_FUNCTION (this << maxRto);
+  m_maxRto = maxRto;
+}
+Time 
+RttEstimator::GetMaxRto (void) const
+{
+  return m_maxRto;
+}
+
 void 
 RttEstimator::SetCurrentEstimate (Time estimate)
 {
@@ -123,7 +142,7 @@ RttEstimator::RttEstimator (const RttEstimator& c)
   : Object (c), m_next (c.m_next), m_history (c.m_history), 
     m_maxMultiplier (c.m_maxMultiplier), 
     m_initialEstimatedRtt (c.m_initialEstimatedRtt),
-    m_currentEstimatedRtt (c.m_currentEstimatedRtt), m_minRto (c.m_minRto),
+    m_currentEstimatedRtt (c.m_currentEstimatedRtt), m_minRto (c.m_minRto), m_maxRto (c.m_maxRto),
     m_nSamples (c.m_nSamples), m_multiplier (c.m_multiplier)
 {
   NS_LOG_FUNCTION (this);
@@ -234,9 +253,14 @@ RttMeanDeviation::GetTypeId (void)
     .SetParent<RttEstimator> ()
     .AddConstructor<RttMeanDeviation> ()
     .AddAttribute ("Gain",
-                   "Gain used in estimating the RTT, must be 0 < Gain < 1",
-                   DoubleValue (0.1),
+                   "Gain used in estimating the RTT (smoothed RTT), must be 0 < Gain < 1",
+                   DoubleValue (0.125),
                    MakeDoubleAccessor (&RttMeanDeviation::m_gain),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("Gain2",
+                   "Gain2 used in estimating the RTT (variance), must be 0 < Gain2 < 1",
+                   DoubleValue (0.25),
+                   MakeDoubleAccessor (&RttMeanDeviation::m_gain2),
                    MakeDoubleChecker<double> ())
   ;
   return tid;
@@ -249,7 +273,7 @@ RttMeanDeviation::RttMeanDeviation() :
 }
 
 RttMeanDeviation::RttMeanDeviation (const RttMeanDeviation& c)
-  : RttEstimator (c), m_gain (c.m_gain), m_variance (c.m_variance)
+  : RttEstimator (c), m_gain (c.m_gain), m_gain2 (c.m_gain2), m_variance (c.m_variance)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -263,14 +287,15 @@ void RttMeanDeviation::Measurement (Time m)
       double gErr = err.ToDouble (Time::S) * m_gain;
       m_currentEstimatedRtt += Time::FromDouble (gErr, Time::S);
       Time difference = Abs (err) - m_variance;
-      NS_LOG_DEBUG ("m_variance += " << Time::FromDouble (difference.ToDouble (Time::S) * m_gain, Time::S));
-      m_variance += Time::FromDouble (difference.ToDouble (Time::S) * m_gain, Time::S);
+      NS_LOG_DEBUG ("m_variance += " << Time::FromDouble (difference.ToDouble (Time::S) * m_gain2, Time::S));
+      m_variance += Time::FromDouble (difference.ToDouble (Time::S) * m_gain2, Time::S);
     }
   else
     { // First sample
       m_currentEstimatedRtt = m;             // Set estimate to current
       //variance = sample / 2;               // And variance to current / 2
-      m_variance = m; // try this
+      // m_variance = m; // try this  why????
+      m_variance = Seconds (m.ToDouble (Time::S) / 2);
       NS_LOG_DEBUG ("(first sample) m_variance += " << m);
     }
   m_nSamples++;
@@ -279,17 +304,29 @@ void RttMeanDeviation::Measurement (Time m)
 Time RttMeanDeviation::RetransmitTimeout ()
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_DEBUG ("RetransmitTimeout:  var " << m_variance.GetSeconds () << " est " << m_currentEstimatedRtt.GetSeconds () << " multiplier " << m_multiplier);
-  // RTO = srtt + 4* rttvar
-  int64_t temp = m_currentEstimatedRtt.ToInteger (Time::MS) + 4 * m_variance.ToInteger (Time::MS);
-  if (temp < m_minRto.ToInteger (Time::MS))
-    {
-      temp = m_minRto.ToInteger (Time::MS);
-    } 
-  temp = temp * m_multiplier; // Apply backoff
-  Time retval = Time::FromInteger (temp, Time::MS);
-  NS_LOG_DEBUG ("RetransmitTimeout:  return " << retval.GetSeconds ());
-  return (retval);  
+  // If not enough samples, just return 2 times estimate
+  //if (nSamples < 2) return est * 2;
+
+  double retval = std::min (m_maxRto.ToDouble (Time::S),
+                            std::max (m_minRto.ToDouble (Time::S),
+                                      m_currentEstimatedRtt.ToDouble (Time::S) + 4 * m_variance.ToDouble (Time::S)));
+   
+  // NS_LOG_DEBUG ("RetransmitTimeout:  var " << var << " est " << m_currentEstimatedRtt.ToDouble (Time::S) << " multiplier " << m_multiplier);
+  // if (var < (m_currentEstimatedRtt.ToDouble (Time::S) / 4.0) )
+  //   {
+  //     for (uint16_t i = 0; i < 2* m_multiplier; i++)
+  //       {
+  //         retval += m_currentEstimatedRtt;
+  //       }
+  //   }
+  // else
+  //   {
+  //     int64_t temp = m_currentEstimatedRtt.ToInteger (Time::S) + 4 * m_variance.ToInteger (Time::S);
+  //     retval = Time::FromInteger (temp, Time::S);
+  //   }
+  NS_LOG_DEBUG ("RetransmitTimeout:  return " << retval);
+
+  return Seconds (retval);
 }
 
 Ptr<RttEstimator> RttMeanDeviation::Copy () const
