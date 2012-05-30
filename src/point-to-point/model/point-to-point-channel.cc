@@ -108,18 +108,18 @@ PointToPointChannel::TransmitStart (
 
   uint32_t wire = src == m_link[0].m_src ? 0 : 1;
 
-  Ptr<const TypeTag> tag = p->PeekPacketTag<TypeTag> ();
+  // Ptr<const TypeTag> tag = p->PeekPacketTag<TypeTag> ();
   // NS_LOG_DEBUG ("Packet tag is: " << tag);  
 
   // if (tag != 0 && tag->GetType () == TypeTag::DATA)
   //   {
-  //     if (m_loss != 0 && m_loss->IsLoss (p))
-  //       {
-  //         // drop packet
-  //         m_dropPointToPoint (GetId (), p, src, m_link[wire].m_dst, txTime, txTime + m_delay);
+  if (m_loss != 0 && m_loss->IsLoss (p))
+    {
+      // drop packet
+      m_dropPointToPoint (GetId (), p, src, m_link[wire].m_dst, txTime, txTime + m_delay);
       
-  //         return false;
-  //       }
+      return false;
+    }
   //   }
   // continue normal operations
   
