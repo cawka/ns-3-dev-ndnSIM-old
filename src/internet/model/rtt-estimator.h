@@ -125,6 +125,18 @@ public:
   Time GetMinRto (void) const;
 
   /**
+   * \brief Sets the Maximum RTO.
+   * \param minRto The maximum RTO returned by the estimator.
+   */
+  void SetMaxRto (Time maxRto);
+
+  /**
+   * \brief Get the Maximum RTO.
+   * \return The maximum RTO returned by the estimator.
+   */
+  Time GetMaxRto (void) const;
+  
+  /**
    * \brief Sets the current RTT estimate (forcefully).
    * \param estimate The current RTT estimate.
    */
@@ -145,6 +157,7 @@ private:
 protected:
   Time         m_currentEstimatedRtt;     // Current estimate
   Time         m_minRto;                  // minimum value of the timeout
+  Time         m_maxRto;                  // maximum value of the timeout
   uint32_t     m_nSamples;                // Number of samples
   uint16_t     m_multiplier;              // RTO Multiplier
 };
@@ -194,6 +207,7 @@ public:
 
 private:
   double       m_gain;       // Filter gain
+  double       m_gain2;      // Filter gain
   Time         m_variance;   // Current variance
 };
 } // namespace ns3
