@@ -6,7 +6,10 @@ import ns.internet
 import ns.mesh
 import ns.wimax
 import ns.wimax
-import ns.lte
+try:
+  import ns.lte
+except:
+  pass
 
 import gobject
 import os.path
@@ -43,9 +46,12 @@ netdevice_traits = {
     ns.mesh.MeshPointDevice: NetDeviceTraits(is_virtual=True),
     ns.wimax.SubscriberStationNetDevice: NetDeviceTraits(is_wireless=True),
     ns.wimax.BaseStationNetDevice: NetDeviceTraits(is_wireless=True),
-    ns.lte.UeNetDevice: NetDeviceTraits(is_wireless=True),
-    ns.lte.EnbNetDevice: NetDeviceTraits(is_wireless=True),
 }
+try:
+  netdevice_traits[ns.lte.UeNetDevice] = NetDeviceTraits(is_wireless=True)
+  netdevice_traits[ns.lte.EnbNetDevice] = NetDeviceTraits(is_wireless=True)
+except:
+  pass
 
 def lookup_netdevice_traits(class_type):
     try:
