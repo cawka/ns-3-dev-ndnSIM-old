@@ -1,3 +1,9 @@
+Note:
+
+This is a custom and unsupported fork of NS-3 simulator (http://www.nsnam.org/).
+
+**The code in this repository is frequently rebased on top of the latest ns-3-dev branch** 
+
 
     The Network Simulator, Version 3
     --------------------------------
