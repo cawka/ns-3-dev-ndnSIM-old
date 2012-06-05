@@ -97,7 +97,7 @@ Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables (void)
           
           for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
             {
-              ipv4->SetMetric (iface, UINT16_MAX);
+              ipv4->SetMetric (iface, std::numeric_limits<uint16_t>::max ());
             }
           ipv4->SetMetric (enabledInterface, originalMetric[enabledInterface]);
 
