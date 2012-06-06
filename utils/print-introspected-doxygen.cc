@@ -315,17 +315,20 @@ PrintHelp (const char *program_name)
             << std::endl
             << "Options:" << std::endl
             << "  --help        : print these options" << std::endl
-            << "  --output-text : format output as plain text" << std::endl;  
+            << "  --output-text : format output as plain text" << std::endl
+	    << "  --group <group> : print information only for this group" << std::endl;  
 }
 
 int main (int argc, char *argv[])
 {
   bool outputText = false;
   char *programName = argv[0];
+  std::string group = "";
 
   argv++;
+  argc--;
 
-  while (*argv != 0)
+  while (argc > 0 && *argv != 0)
     {
       char *arg = *argv;
 
@@ -338,6 +341,17 @@ int main (int argc, char *argv[])
         {
           outputText = true;
         }
+      else if (strcmp(arg, "--group") == 0)
+	{
+	  argv ++;
+	  argc --;
+	  if (argc == 0 || argv == 0)
+	    {
+	      PrintHelp (programName);
+	      return 0;
+	    }
+	  group = *argv;
+	}
       else
         {
           // un-recognized command-line argument
@@ -345,6 +359,7 @@ int main (int argc, char *argv[])
           return 0;
         }
       argv++;
+      argc--;
     }
 
   if (outputText)
@@ -434,6 +449,11 @@ int main (int argc, char *argv[])
     {
       TypeId tid = TypeId::GetRegistered (i);
       if (tid.MustHideFromDocumentation ())
+	{
+	  continue;
+	}
+
+      if (group != "" && tid.GetGroupName () != group)
 	{
 	  continue;
 	}
@@ -537,6 +557,12 @@ int main (int argc, char *argv[])
 	{
 	  continue;
 	}
+
+      if (group != "" && tid.GetGroupName () != group)
+	{
+	  continue;
+	}
+      
       std::cout << boldStart << tid.GetName () << boldStop << breakHtmlOnly << std::endl
 		<< listStart << std::endl;
       for (uint32_t j = 0; j < tid.GetTraceSourceN (); ++j)
@@ -559,6 +585,12 @@ int main (int argc, char *argv[])
 	{
 	  continue;
 	}
+
+      if (group != "" && tid.GetGroupName () != group)
+	{
+	  continue;
+	}
+
       std::cout << boldStart << tid.GetName () << boldStop << breakHtmlOnly << std::endl
 		<< listStart << std::endl;
       for (uint32_t j = 0; j < tid.GetAttributeN (); ++j)
