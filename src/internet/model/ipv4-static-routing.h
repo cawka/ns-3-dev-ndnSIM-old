@@ -375,13 +375,13 @@ protected:
   virtual void DoDispose (void);
 
 private:
-  typedef std::list<Ipv4RoutingTableEntry *> NetworkRoutes;
-  // typedef std::list<Ipv4RoutingTableEntry *>::const_iterator NetworkRoutesCI;
-  // typedef std::list<Ipv4RoutingTableEntry *>::iterator NetworkRoutesI;
+  typedef std::list<std::pair <Ipv4RoutingTableEntry *, uint32_t> > NetworkRoutes;
+  typedef std::list<std::pair <Ipv4RoutingTableEntry *, uint32_t> >::const_iterator NetworkRoutesCI;
+  typedef std::list<std::pair <Ipv4RoutingTableEntry *, uint32_t> >::iterator NetworkRoutesI;
 
   typedef std::list<Ipv4MulticastRoutingTableEntry *> MulticastRoutes;
-  // typedef std::list<Ipv4MulticastRoutingTableEntry *>::const_iterator MulticastRoutesCI;
-  // typedef std::list<Ipv4MulticastRoutingTableEntry *>::iterator MulticastRoutesI;
+  typedef std::list<Ipv4MulticastRoutingTableEntry *>::const_iterator MulticastRoutesCI;
+  typedef std::list<Ipv4MulticastRoutingTableEntry *>::iterator MulticastRoutesI;
 
   Ptr<Ipv4Route> LookupStatic (Ipv4Address dest, Ptr<NetDevice> oif = 0);
   Ptr<Ipv4MulticastRoute> LookupStatic (Ipv4Address origin, Ipv4Address group,

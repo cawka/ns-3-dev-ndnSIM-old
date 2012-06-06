@@ -22,15 +22,12 @@
 
 #include <list>
 #include <stdint.h>
-#include <bitset>
 #include "ns3/ipv4-address.h"
 #include "ns3/ipv4-header.h"
 #include "ns3/ptr.h"
 #include "ns3/ipv4.h"
 #include "ns3/ipv4-routing-protocol.h"
 #include "ns3/random-variable.h"
-#include "ns3/trie.h"
-#include "ns3/ipv4-routing-table-entry.h"
 
 namespace ns3 {
 
@@ -40,6 +37,7 @@ class Ipv4Interface;
 class Ipv4Address;
 class Ipv4Header;
 class Ipv4RoutingTableEntry;
+class Ipv4MulticastRoutingTableEntry;
 class Node;
 
 
@@ -97,33 +95,29 @@ public:
   virtual void PrintRoutingTable (Ptr<OutputStreamWrapper> stream) const;
 
 /**
- * \brief Add a route to the global routing table.
+ * \brief Add a host route to the global routing table.
  *
  * \param dest The Ipv4Address destination for this route.
- * \param destMask The Ipv4Mask to extract the network.
  * \param nextHop The Ipv4Address of the next hop in the route.
  * \param interface The network interface index used to send packets to the
  * destination.
  *
  * \see Ipv4Address
  */
-  void AddRouteTo (Ipv4Address dest, 
-                   Ipv4Mask destMask, 
-                   Ipv4Address nextHop, 
-                   uint32_t interface,
-                   uint32_t metric=0);
-// /**
-//  * \brief Add a host route to the global routing table.
-//  *
-//  * \param dest The Ipv4Address destination for this route.
-//  * \param interface The network interface index used to send packets to the
-//  * destination.
-//  *
-//  * \see Ipv4Address
-//  */
-//   void AddHostRouteTo (Ipv4Address dest, 
-//                        uint32_t interface,
-//                        uint32_t metric=0);
+  void AddHostRouteTo (Ipv4Address dest, 
+                       Ipv4Address nextHop, 
+                       uint32_t interface);
+/**
+ * \brief Add a host route to the global routing table.
+ *
+ * \param dest The Ipv4Address destination for this route.
+ * \param interface The network interface index used to send packets to the
+ * destination.
+ *
+ * \see Ipv4Address
+ */
+  void AddHostRouteTo (Ipv4Address dest, 
+                       uint32_t interface);
 
 /**
  * \brief Add a network route to the global routing table.
@@ -136,11 +130,10 @@ public:
  *
  * \see Ipv4Address
  */
-  // void AddNetworkRouteTo (Ipv4Address network, 
-  //                         Ipv4Mask networkMask, 
-  //                         Ipv4Address nextHop, 
-  //                         uint32_t interface,
-  //                         uint32_t metric=0);
+  void AddNetworkRouteTo (Ipv4Address network, 
+                          Ipv4Mask networkMask, 
+                          Ipv4Address nextHop, 
+                          uint32_t interface);
 
 /**
  * \brief Add a network route to the global routing table.
@@ -152,10 +145,9 @@ public:
  *
  * \see Ipv4Address
  */
-  // void AddNetworkRouteTo (Ipv4Address network, 
-  //                         Ipv4Mask networkMask, 
-  //                         uint32_t interface,
-  //                         uint32_t metric=0);
+  void AddNetworkRouteTo (Ipv4Address network, 
+                          Ipv4Mask networkMask, 
+                          uint32_t interface);
 
 /**
  * \brief Add an external route to the global routing table.
@@ -166,11 +158,10 @@ public:
  * \param interface The network interface index used to send packets to the
  * destination.
  */
-  // void AddASExternalRouteTo (Ipv4Address network,
-  //                            Ipv4Mask networkMask,
-  //                            Ipv4Address nextHop,
-  //                            uint32_t interface,
-  //                            uint32_t metric=0);
+  void AddASExternalRouteTo (Ipv4Address network,
+                             Ipv4Mask networkMask,
+                             Ipv4Address nextHop,
+                             uint32_t interface);
 
 /**
  * \brief Get the number of individual unicast routes that have been added
@@ -178,7 +169,7 @@ public:
  *
  * \warning The default route counts as one of the routes.
  */
-  // uint32_t GetNRoutes (void) const;
+  uint32_t GetNRoutes (void) const;
 
 /**
  * \brief Get a route from the global unicast routing table.
@@ -200,7 +191,7 @@ public:
  * \see Ipv4RoutingTableEntry
  * \see Ipv4GlobalRouting::RemoveRoute
  */
-  // Ipv4RoutingTableEntry *GetRoute (uint32_t i) const;
+  Ipv4RoutingTableEntry *GetRoute (uint32_t i) const;
 
 /**
  * \brief Remove a route from the global unicast routing table.
@@ -218,13 +209,8 @@ public:
  * \see Ipv4GlobalRouting::GetRoute
  * \see Ipv4GlobalRouting::AddRoute
  */
-  // void RemoveRoute (uint32_t i);
+  void RemoveRoute (uint32_t i);
 
-  /**
-   * \brief Function to remove all routes
-   */
-  void DeleteRoutes ();
-  
 protected:
   void DoDispose (void);
 
@@ -236,20 +222,21 @@ private:
   /// A uniform random number generator for randomly routing packets among ECMP 
   UniformVariable m_rand;
 
-  // typedef std::list<Ipv4RoutingTableEntry *> HostRoutes;
-  // typedef std::list<Ipv4RoutingTableEntry *> NetworkRoutes;
-  // typedef std::list<Ipv4RoutingTableEntry *> ASExternalRoutes;
-
-  // unique fields: IP, Prefix
+  typedef std::list<Ipv4RoutingTableEntry *> HostRoutes;
+  typedef std::list<Ipv4RoutingTableEntry *>::const_iterator HostRoutesCI;
+  typedef std::list<Ipv4RoutingTableEntry *>::iterator HostRoutesI;
+  typedef std::list<Ipv4RoutingTableEntry *> NetworkRoutes;
+  typedef std::list<Ipv4RoutingTableEntry *>::const_iterator NetworkRoutesCI;
+  typedef std::list<Ipv4RoutingTableEntry *>::iterator NetworkRoutesI;
+  typedef std::list<Ipv4RoutingTableEntry *> ASExternalRoutes;
+  typedef std::list<Ipv4RoutingTableEntry *>::const_iterator ASExternalRoutesCI;
+  typedef std::list<Ipv4RoutingTableEntry *>::iterator ASExternalRoutesI;
 
   Ptr<Ipv4Route> LookupGlobal (Ipv4Address dest, Ptr<NetDevice> oif = 0);
 
-  typedef Ipv4AddressTrie<Ipv4RoutingTableEntry> Ipv4AddressTrieMap;
-  Ipv4AddressTrieMap m_routes;
-  
-  // HostRoutes m_hostRoutes;
-  // NetworkRoutes m_networkRoutes;
-  // ASExternalRoutes m_ASexternalRoutes; // External routes imported
+  HostRoutes m_hostRoutes;
+  NetworkRoutes m_networkRoutes;
+  ASExternalRoutes m_ASexternalRoutes; // External routes imported
 
   Ptr<Ipv4> m_ipv4;
 };

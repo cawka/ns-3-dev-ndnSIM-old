@@ -567,7 +567,18 @@ GlobalRouteManagerImpl::DeleteGlobalRoutes ()
           continue;
         }
       Ptr<Ipv4GlobalRouting> gr = router->GetRoutingProtocol ();
-      gr->DeleteRoutes ();
+      uint32_t j = 0;
+      uint32_t nRoutes = gr->GetNRoutes ();
+      NS_LOG_LOGIC ("Deleting " << gr->GetNRoutes ()<< " routes from node " << node->GetId ());
+      // Each time we delete route 0, the route index shifts downward
+      // We can delete all routes if we delete the route numbered 0
+      // nRoutes times
+      for (j = 0; j < nRoutes; j++)
+        {
+          NS_LOG_LOGIC ("Deleting global route " << j << " from node " << node->GetId ());
+          gr->RemoveRoute (0);
+        }
+      NS_LOG_LOGIC ("Deleted " << j << " global routes from node "<< node->GetId ());
     }
   if (m_lsdb)
     {
@@ -701,7 +712,6 @@ GlobalRouteManagerImpl::InitializeRoutes ()
       if (rtr && rtr->GetNumLSAs () )
         {
           SPFCalculate (rtr->GetRouterId ());
-          // break;
         }
     }
   NS_LOG_INFO ("Finished SPF calculation");
@@ -866,7 +876,7 @@ GlobalRouteManagerImpl::SPFNext (SPFVertex* v, CandidateQueue& candidate)
       else if (w_lsa->GetStatus () == GlobalRoutingLSA::LSA_SPF_CANDIDATE)
         {
 //
-// We have already considered the link represented by <w>.  What we have to
+// We have already considered the link represented by <w>.  What wse have to
 // do now is to decide if this new router represents a route with a shorter
 // distance metric.
 //
@@ -1299,8 +1309,8 @@ GlobalRouteManagerImpl::CheckForStubNode (Ipv4Address root)
                   NS_ASSERT (router);
                   Ptr<Ipv4GlobalRouting> gr = router->GetRoutingProtocol ();
                   NS_ASSERT (gr);
-                  gr->AddRouteTo (Ipv4Address ("0.0.0.0"), Ipv4Mask ("0.0.0.0"), lr->GetLinkData (), 
-                                  FindOutgoingInterfaceId (transitLink->GetLinkData ()));
+                  gr->AddNetworkRouteTo (Ipv4Address ("0.0.0.0"), Ipv4Mask ("0.0.0.0"), lr->GetLinkData (), 
+                                         FindOutgoingInterfaceId (transitLink->GetLinkData ()));
                   NS_LOG_LOGIC ("Inserting default route for node " << myRouterId << " to next hop " << 
                                 lr->GetLinkData () << " via interface " << 
                                 FindOutgoingInterfaceId (transitLink->GetLinkData ()));
@@ -1617,7 +1627,7 @@ GlobalRouteManagerImpl::SPFAddASExternal (GlobalRoutingLSA *extlsa, SPFVertex *v
               int32_t outIf = exit.second;
               if (outIf >= 0)
                 {
-                  gr->AddRouteTo (tempip, tempmask, nextHop, outIf, v->GetDistanceFromRoot ());
+                  gr->AddASExternalRouteTo (tempip, tempmask, nextHop, outIf);
                   NS_LOG_LOGIC ("(Route " << i << ") Node " << node->GetId () <<
                                 " add external network route to " << tempip <<
                                 " using next hop " << nextHop <<
@@ -1692,7 +1702,7 @@ GlobalRouteManagerImpl::SPFIntraAddStub (GlobalRoutingLinkRecord *l, SPFVertex* 
       NS_LOG_LOGIC ("Stub is on local host: " << v->GetVertexId () << "; returning");
       return;
     }
-  NS_LOG_LOGIC ("Stub is on remote host: " << v->GetVertexId () << "; installing (" << v->GetDistanceFromRoot () << ")");
+  NS_LOG_LOGIC ("Stub is on remote host: " << v->GetVertexId () << "; installing");
 //
 // The root of the Shortest Path First tree is the router to which we are 
 // going to write the actual routing table entries.  The vertex corresponding
@@ -1788,12 +1798,11 @@ GlobalRouteManagerImpl::SPFIntraAddStub (GlobalRoutingLinkRecord *l, SPFVertex* 
               int32_t outIf = exit.second;
               if (outIf >= 0)
                 {
-                  gr->AddRouteTo (tempip, tempmask, nextHop, outIf, v->GetDistanceFromRoot ());
+                  gr->AddNetworkRouteTo (tempip, tempmask, nextHop, outIf);
                   NS_LOG_LOGIC ("(Route " << i << ") Node " << node->GetId () <<
                                 " add network route to " << tempip <<
                                 " using next hop " << nextHop <<
-                                " via interface " << outIf <<
-                                " metric " << v->GetDistanceFromRoot () );
+                                " via interface " << outIf);
                 }
               else
                 {
@@ -2024,8 +2033,8 @@ GlobalRouteManagerImpl::SPFIntraAddRouter (SPFVertex* v)
                   int32_t outIf = exit.second;
                   if (outIf >= 0)
                     {
-                      gr->AddRouteTo (lr->GetLinkData (), Ipv4Mask::GetOnes (), nextHop,
-                                      outIf, v->GetDistanceFromRoot ());
+                      gr->AddHostRouteTo (lr->GetLinkData (), nextHop,
+                                          outIf);
                       NS_LOG_LOGIC ("(Route " << i << ") Node " << node->GetId () <<
                                     " adding host route to " << lr->GetLinkData () <<
                                     " using next hop " << nextHop <<
@@ -2138,7 +2147,7 @@ GlobalRouteManagerImpl::SPFIntraAddTransit (SPFVertex* v)
 
               if (outIf >= 0)
                 {
-                  gr->AddRouteTo (tempip, tempmask, nextHop, outIf, v->GetDistanceFromRoot ());
+                  gr->AddNetworkRouteTo (tempip, tempmask, nextHop, outIf);
                   NS_LOG_LOGIC ("(Route " << i << ") Node " << node->GetId () <<
                                 " add network route to " << tempip <<
                                 " using next hop " << nextHop <<

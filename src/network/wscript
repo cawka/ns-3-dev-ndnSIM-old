@@ -124,7 +124,6 @@ def build(bld):
         'utils/simple-channel.h',
         'utils/simple-net-device.h',
         'utils/pcap-test.h',
-        'utils/trie.h',
         'helper/application-container.h',
         'helper/net-device-container.h',
         'helper/node-container.h',
