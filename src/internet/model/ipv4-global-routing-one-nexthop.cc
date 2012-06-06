@@ -38,13 +38,8 @@ Ipv4GlobalRoutingOneNexthop::GetTypeId (void)
 { 
   static TypeId tid = TypeId ("ns3::Ipv4GlobalRoutingOneNexthop")
     .SetParent<Ipv4GlobalRouting> ()
-    .AddConstructor<Ipv4GlobalRoutingOneNexthop> ()
   ;
   return tid;
-}
-
-Ipv4GlobalRoutingOneNexthop::Ipv4GlobalRoutingOneNexthop ()
-{
 }
 
 void
