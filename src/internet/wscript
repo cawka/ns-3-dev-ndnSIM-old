@@ -93,7 +93,6 @@ def configure(conf):
 def build(bld):
     # bridge and mpi dependencies are due to global routing
     obj = bld.create_ns3_module('internet', ['bridge', 'mpi', 'network', 'core'])
-
     obj.source = [
         'model/ip-l4-protocol.cc',
         'model/udp-header.cc',
@@ -174,7 +173,6 @@ def build(bld):
         'model/global-route-manager-impl.cc',
         'model/candidate-queue.cc',
         'model/ipv4-global-routing.cc',
-        'model/ipv4-global-routing-one-nexthop.cc',
         'helper/ipv4-global-routing-helper.cc',
         'helper/internet-stack-helper.cc',
         'helper/internet-trace-helper.cc',
@@ -272,7 +270,6 @@ def build(bld):
         'model/global-route-manager-impl.h',
         'model/candidate-queue.h',
         'model/ipv4-global-routing.h',
-        'model/ipv4-global-routing-one-nexthop.h',
         'helper/ipv4-global-routing-helper.h',
         'helper/internet-stack-helper.h',
         'helper/internet-trace-helper.h',

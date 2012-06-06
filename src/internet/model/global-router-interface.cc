@@ -528,28 +528,28 @@ GlobalRouter::~GlobalRouter ()
   ClearLSAs ();
 }
 
-// void 
-// GlobalRouter::SetRoutingProtocol (Ptr<Ipv4GlobalRouting> routing)
-// {
-//   m_routingProtocol = routing;
-// }
-// Ptr<Ipv4GlobalRouting> 
-// GlobalRouter::GetRoutingProtocol (void)
-// {
-//   return m_routingProtocol;
-// }
+void 
+GlobalRouter::SetRoutingProtocol (Ptr<Ipv4GlobalRouting> routing)
+{
+  m_routingProtocol = routing;
+}
+Ptr<Ipv4GlobalRouting> 
+GlobalRouter::GetRoutingProtocol (void)
+{
+  return m_routingProtocol;
+}
 
 void
 GlobalRouter::DoDispose ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  // m_routingProtocol = 0;
-  // for (InjectedRoutesI k = m_injectedRoutes.begin ();
-  //      k != m_injectedRoutes.end ();
-  //      k = m_injectedRoutes.erase (k))
-  //   {
-  //     delete (*k);
-  //   }
+  m_routingProtocol = 0;
+  for (InjectedRoutesI k = m_injectedRoutes.begin ();
+       k != m_injectedRoutes.end ();
+       k = m_injectedRoutes.erase (k))
+    {
+      delete (*k);
+    }
   Object::DoDispose ();
 }
 
@@ -719,15 +719,15 @@ GlobalRouter::DiscoverLSAs ()
   // Build injected route LSAs as external routes
   // RFC 2328, section 12.4.4
   //
-  for (RouteList::const_iterator i = m_injectedRoutes.begin ();
+  for (InjectedRoutesCI i = m_injectedRoutes.begin ();
        i != m_injectedRoutes.end ();
        i++)
     {
       GlobalRoutingLSA *pLSA = new GlobalRoutingLSA;
       pLSA->SetLSType (GlobalRoutingLSA::ASExternalLSAs);
-      pLSA->SetLinkStateId (i->GetDestNetwork ());
+      pLSA->SetLinkStateId ((*i)->GetDestNetwork ());
       pLSA->SetAdvertisingRouter (m_routerId);
-      pLSA->SetNetworkLSANetworkMask (i->GetDestNetworkMask ());
+      pLSA->SetNetworkLSANetworkMask ((*i)->GetDestNetworkMask ());
       pLSA->SetStatus (GlobalRoutingLSA::LSA_SPF_NOT_EXPLORED);
       m_LSAs.push_back (pLSA); 
     }
@@ -1507,74 +1507,77 @@ GlobalRouter::GetLSA (uint32_t n, GlobalRoutingLSA &lsa) const
 }
 
 void
-GlobalRouter::InjectRoute (Ipv4Address network, Ipv4Mask networkMask, uint32_t metric/*=1*/)
+GlobalRouter::InjectRoute (Ipv4Address network, Ipv4Mask networkMask)
 {
-  NS_LOG_FUNCTION (network << networkMask << metric);
-
-  WithdrawRoute (network, networkMask); //slight inefficiency to prevent duplicate routes
-  m_injectedRoutes.push_back (Ipv4RoutingTableEntry::CreateNetworkRouteTo (network,
-                                                                           networkMask,
-                                                                           metric));
+  NS_LOG_FUNCTION (network << networkMask);
+  Ipv4RoutingTableEntry *route = new Ipv4RoutingTableEntry ();
+//
+// Interface number does not matter here, using 1.
+//
+  *route = Ipv4RoutingTableEntry::CreateNetworkRouteTo (network,
+                                                        networkMask,
+                                                        1);
+  m_injectedRoutes.push_back (route);
 }
 
-// Ipv4RoutingTableEntry *
-// GlobalRouter::GetInjectedRoute (uint32_t index)
-// {
-//   NS_LOG_FUNCTION (index);
-//   if (index < m_injectedRoutes.size ())
-//     {
-//       uint32_t tmp = 0;
-//       for (InjectedRoutesCI i = m_injectedRoutes.begin ();
-//            i != m_injectedRoutes.end ();
-//            i++)
-//         {
-//           if (tmp  == index)
-//             {
-//               return *i;
-//             }
-//           tmp++;
-//         }
-//     }
-//   NS_ASSERT (false);
-//   // quiet compiler.
-//   return 0;
-// }
+Ipv4RoutingTableEntry *
+GlobalRouter::GetInjectedRoute (uint32_t index)
+{
+  NS_LOG_FUNCTION (index);
+  if (index < m_injectedRoutes.size ())
+    {
+      uint32_t tmp = 0;
+      for (InjectedRoutesCI i = m_injectedRoutes.begin ();
+           i != m_injectedRoutes.end ();
+           i++)
+        {
+          if (tmp  == index)
+            {
+              return *i;
+            }
+          tmp++;
+        }
+    }
+  NS_ASSERT (false);
+  // quiet compiler.
+  return 0;
+}
 
-// uint32_t
-// GlobalRouter::GetNInjectedRoutes ()
-// {
-//   return m_injectedRoutes.size ();
-// }
+uint32_t
+GlobalRouter::GetNInjectedRoutes ()
+{
+  return m_injectedRoutes.size ();
+}
 
-// void
-// GlobalRouter::RemoveInjectedRoute (uint32_t index)
-// {
-//   NS_LOG_FUNCTION (index);
-//   NS_ASSERT (index < m_injectedRoutes.size ());
-//   uint32_t tmp = 0;
-//   for (InjectedRoutesI i = m_injectedRoutes.begin (); i != m_injectedRoutes.end (); i++)
-//     {
-//       if (tmp  == index)
-//         {
-//           NS_LOG_LOGIC ("Removing route " << index << "; size = " << m_injectedRoutes.size ());
-//           delete *i;
-//           m_injectedRoutes.erase (i);
-//           return;
-//         }
-//       tmp++;
-//     }
-// }
+void
+GlobalRouter::RemoveInjectedRoute (uint32_t index)
+{
+  NS_LOG_FUNCTION (index);
+  NS_ASSERT (index < m_injectedRoutes.size ());
+  uint32_t tmp = 0;
+  for (InjectedRoutesI i = m_injectedRoutes.begin (); i != m_injectedRoutes.end (); i++)
+    {
+      if (tmp  == index)
+        {
+          NS_LOG_LOGIC ("Removing route " << index << "; size = " << m_injectedRoutes.size ());
+          delete *i;
+          m_injectedRoutes.erase (i);
+          return;
+        }
+      tmp++;
+    }
+}
 
 bool
 GlobalRouter::WithdrawRoute (Ipv4Address network, Ipv4Mask networkMask)
 {
   NS_LOG_FUNCTION (network << networkMask);
-  
-  for (RouteList::iterator i = m_injectedRoutes.begin (); i != m_injectedRoutes.end (); i++)
+  for (InjectedRoutesI i = m_injectedRoutes.begin (); i != m_injectedRoutes.end (); i++)
     {
-      if (i->GetDestNetwork () == network && i->GetDestNetworkMask () == networkMask)
+      if ((*i)->GetDestNetwork () == network && (*i)->GetDestNetworkMask () == networkMask)
         {
           NS_LOG_LOGIC ("Withdrawing route to network/mask " << network << "/" << networkMask);
+          delete *i;
           m_injectedRoutes.erase (i);
           return true;
         }

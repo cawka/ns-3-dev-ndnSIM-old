@@ -35,7 +35,6 @@
 #include "ns3/ipv4-routing-protocol.h"
 #include "ns3/ipv4-list-routing.h"
 #include "ns3/mpi-interface.h"
-#include "ns3/ipv4-routing-helper.h"
 #include "global-router-interface.h"
 #include "global-route-manager-impl.h"
 #include "candidate-queue.h"
@@ -567,14 +566,7 @@ GlobalRouteManagerImpl::DeleteGlobalRoutes ()
         {
           continue;
         }
-      Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> ();
-      NS_ASSERT_MSG (ipv4 != 0, "GlobalRouteManagerImpl requires IPv4 stack to be installed on the node");
-      
-      Ptr<Ipv4GlobalRouting> gr = Ipv4RoutingHelper::
-        GetRouting<Ipv4GlobalRouting> (ipv4->GetRoutingProtocol ());
-
-      NS_ASSERT_MSG (gr != 0, "GlobalRouteManagerImpl needs an instance of Ipv4GlobalRouting to be installed on the node");
-
+      Ptr<Ipv4GlobalRouting> gr = router->GetRoutingProtocol ();
       gr->DeleteRoutes ();
     }
   if (m_lsdb)
@@ -623,14 +615,7 @@ GlobalRouteManagerImpl::BuildGlobalRoutingDatabase ()
 // DiscoverLSAs () will get zero as the number since no routes have been 
 // found.
 //
-      Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> ();
-      NS_ASSERT_MSG (ipv4 != 0, "GlobalRouteManagerImpl requires IPv4 stack to be installed on the node");
-      
-      Ptr<Ipv4GlobalRouting> grouting = Ipv4RoutingHelper::
-        GetRouting<Ipv4GlobalRouting> (ipv4->GetRoutingProtocol ());
-
-      NS_ASSERT_MSG (grouting != 0, "GlobalRouteManagerImpl needs an instance of Ipv4GlobalRouting to be installed on the node");
-
+      Ptr<Ipv4GlobalRouting> grouting = rtr->GetRoutingProtocol ();
       uint32_t numLSAs = rtr->DiscoverLSAs ();
       NS_LOG_LOGIC ("Found " << numLSAs << " LSAs");
 
@@ -1310,13 +1295,10 @@ GlobalRouteManagerImpl::CheckForStubNode (Ipv4Address root)
               if (lr->GetLinkId () == myRouterId)
                 {
                   // Next hop is stored in the LinkID field of lr
-                  Ptr<Ipv4> ipv4 = rlsa->GetNode ()->GetObject<Ipv4> ();
-                  NS_ASSERT_MSG (ipv4 != 0, "GlobalRouteManagerImpl requires IPv4 stack to be installed on the node");
-      
-                  Ptr<Ipv4GlobalRouting> gr = Ipv4RoutingHelper::
-                    GetRouting<Ipv4GlobalRouting> (ipv4->GetRoutingProtocol ());
-
-                  NS_ASSERT_MSG (gr != 0, "GlobalRouteManagerImpl needs an instance of Ipv4GlobalRouting to be installed on the node");
+                  Ptr<GlobalRouter> router = rlsa->GetNode ()->GetObject<GlobalRouter> ();
+                  NS_ASSERT (router);
+                  Ptr<Ipv4GlobalRouting> gr = router->GetRoutingProtocol ();
+                  NS_ASSERT (gr);
                   gr->AddRouteTo (Ipv4Address ("0.0.0.0"), Ipv4Mask ("0.0.0.0"), lr->GetLinkData (), 
                                   FindOutgoingInterfaceId (transitLink->GetLinkData ()));
                   NS_LOG_LOGIC ("Inserting default route for node " << myRouterId << " to next hop " << 
@@ -1624,10 +1606,8 @@ GlobalRouteManagerImpl::SPFAddASExternal (GlobalRoutingLSA *extlsa, SPFVertex *v
             {
               continue;
             }
-          Ptr<Ipv4GlobalRouting> gr = Ipv4RoutingHelper::
-            GetRouting<Ipv4GlobalRouting> (ipv4->GetRoutingProtocol ());
-
-          NS_ASSERT_MSG (gr != 0, "GlobalRouteManagerImpl needs an instance of Ipv4GlobalRouting to be installed on the node");
+          Ptr<Ipv4GlobalRouting> gr = router->GetRoutingProtocol ();
+          NS_ASSERT (gr);
           // walk through all next-hop-IPs and out-going-interfaces for reaching
           // the stub network gateway 'v' from the root node
           for (uint32_t i = 0; i < v->GetNRootExitDirections (); i++)
@@ -1797,10 +1777,8 @@ GlobalRouteManagerImpl::SPFIntraAddStub (GlobalRoutingLinkRecord *l, SPFVertex* 
             {
               continue;
             }
-          Ptr<Ipv4GlobalRouting> gr = Ipv4RoutingHelper::
-            GetRouting<Ipv4GlobalRouting> (ipv4->GetRoutingProtocol ());
-
-          NS_ASSERT_MSG (gr != 0, "GlobalRouteManagerImpl needs an instance of Ipv4GlobalRouting to be installed on the node");
+          Ptr<Ipv4GlobalRouting> gr = router->GetRoutingProtocol ();
+          NS_ASSERT (gr);
           // walk through all next-hop-IPs and out-going-interfaces for reaching
           // the stub network gateway 'v' from the root node
           for (uint32_t i = 0; i < v->GetNRootExitDirections (); i++)
@@ -2038,10 +2016,8 @@ GlobalRouteManagerImpl::SPFIntraAddRouter (SPFVertex* v)
               // There is no need to add additional host entries to global routing,
               // the same entries are covered by stub network LSAs
               
-              // Ptr<Ipv4GlobalRouting> gr = Ipv4RoutingHelper::
-              //   GetRouting<Ipv4GlobalRouting> (ipv4->GetRoutingProtocol ());
-
-              // NS_ASSERT_MSG (gr != 0, "GlobalRouteManagerImpl needs an instance of Ipv4GlobalRouting to be installed on the node");
+              // Ptr<Ipv4GlobalRouting> gr = router->GetRoutingProtocol ();
+              // NS_ASSERT (gr);
               // // walk through all available exit directions due to ECMP,
               // // and add host route for each of the exit direction toward
               // // the vertex 'v'
@@ -2153,11 +2129,8 @@ GlobalRouteManagerImpl::SPFIntraAddTransit (SPFVertex* v)
             {
               continue;
             }
-      
-          Ptr<Ipv4GlobalRouting> gr = Ipv4RoutingHelper::
-            GetRouting<Ipv4GlobalRouting> (ipv4->GetRoutingProtocol ());
-
-          NS_ASSERT_MSG (gr != 0, "GlobalRouteManagerImpl needs an instance of Ipv4GlobalRouting to be installed on the node");
+          Ptr<Ipv4GlobalRouting> gr = router->GetRoutingProtocol ();
+          NS_ASSERT (gr);
           // walk through all available exit directions due to ECMP,
           // and add host route for each of the exit direction toward
           // the vertex 'v'
