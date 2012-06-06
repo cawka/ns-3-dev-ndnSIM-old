@@ -89,6 +89,7 @@ Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables (void)
           originalMetric[iface] = ipv4->GetMetric (iface);
         }
 
+      UniformVariable m_rand;
       // enable interfaces one by one and calculate routes
       for (uint32_t enabledInterface = 1; enabledInterface < ipv4->GetNInterfaces (); enabledInterface++)
         {
@@ -96,7 +97,7 @@ Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables (void)
           
           for (uint32_t iface = 1; iface < ipv4->GetNInterfaces (); iface++)
             {
-              ipv4->SetMetric (iface, UINT16_MAX);
+              ipv4->SetMetric (iface,  m_rand.GetInteger (1, UINT16_MAX));
             }
           ipv4->SetMetric (enabledInterface, originalMetric[enabledInterface]);
 
