@@ -24,8 +24,6 @@
 #include "global-route-manager.h"
 #include "global-route-manager-impl.h"
 
-NS_LOG_COMPONENT_DEFINE ("GlobalRouteManager1");
-
 namespace ns3 {
 
 // ---------------------------------------------------------------------------
@@ -37,24 +35,13 @@ namespace ns3 {
 void
 GlobalRouteManager::DeleteGlobalRoutes ()
 {
-  NS_LOG_FUNCTION (0);
   SimulationSingleton<GlobalRouteManagerImpl>::Get ()->
-    DeleteGlobalRoutes ();
-}
-
-void
-GlobalRouteManager::ClearLSDB ()
-{
-  NS_LOG_FUNCTION (0);
-  SimulationSingleton<GlobalRouteManagerImpl>::Get ()->
-    ClearLSDB ();
+  DeleteGlobalRoutes ();
 }
 
 void
 GlobalRouteManager::BuildGlobalRoutingDatabase (void) 
 {
-  NS_LOG_FUNCTION (0);
-
   SimulationSingleton<GlobalRouteManagerImpl>::Get ()->
   BuildGlobalRoutingDatabase ();
 }
@@ -62,8 +49,6 @@ GlobalRouteManager::BuildGlobalRoutingDatabase (void)
 void
 GlobalRouteManager::InitializeRoutes (void)
 {
-  NS_LOG_FUNCTION (0);
-
   SimulationSingleton<GlobalRouteManagerImpl>::Get ()->
   InitializeRoutes ();
 }
@@ -71,8 +56,6 @@ GlobalRouteManager::InitializeRoutes (void)
 uint32_t
 GlobalRouteManager::AllocateRouterId (void)
 {
-  NS_LOG_FUNCTION (0);
-
   static uint32_t routerId = 0;
   return routerId++;
 }

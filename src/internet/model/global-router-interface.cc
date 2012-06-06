@@ -729,7 +729,7 @@ GlobalRouter::DiscoverLSAs ()
       pLSA->SetAdvertisingRouter (m_routerId);
       pLSA->SetNetworkLSANetworkMask (i->GetDestNetworkMask ());
       pLSA->SetStatus (GlobalRoutingLSA::LSA_SPF_NOT_EXPLORED);
-      m_LSAs.push_back (pLSA);
+      m_LSAs.push_back (pLSA); 
     }
   return m_LSAs.size ();
 }

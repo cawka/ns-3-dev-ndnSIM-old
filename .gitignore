@@ -45,5 +45,4 @@ massif.*
 \#[^\#/]+\#$
 .lock-wscript
 .lock-wafbuild
-*~
-\#*\#
+

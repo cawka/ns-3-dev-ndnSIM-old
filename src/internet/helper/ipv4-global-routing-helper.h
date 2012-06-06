@@ -22,7 +22,6 @@
 
 #include "ns3/node-container.h"
 #include "ns3/ipv4-routing-helper.h"
-#include "ns3/random-variable.h"
 
 namespace ns3 {
 
@@ -43,7 +42,7 @@ public:
    *
    * param type Type of the global routing
    */
-  Ipv4GlobalRoutingHelper (const std::string &type = "ns3::Ipv4GlobalRoutingOneNexthop");
+  Ipv4GlobalRoutingHelper (GlobalRoutingType type = ONE_NEXT_HOP);
 
   /**
    * \brief Construct a GlobalRoutingHelper from another previously initialized
@@ -78,8 +77,6 @@ public:
    *
    */
   static void PopulateRoutingTables (void);
-
-  static void PopulateAllPossibleRoutingTables ();
   /**
    * \brief Remove all routes that were previously installed in a prior call
    * to either PopulateRoutingTables() or RecomputeRoutingTables(), and 
@@ -101,9 +98,7 @@ private:
    */
   Ipv4GlobalRoutingHelper &operator = (const Ipv4GlobalRoutingHelper &o);
 
-  std::string m_type;
-
-  static UniformVariable m_rand;
+  GlobalRoutingType m_type;
 };
 
 } // namespace ns3

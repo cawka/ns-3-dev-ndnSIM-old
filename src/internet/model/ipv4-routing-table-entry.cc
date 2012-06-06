@@ -167,12 +167,6 @@ Ipv4RoutingTableEntry::GetMetric () const
   return m_metric;
 }
 
-void
-Ipv4RoutingTableEntry::SetMetric (uint32_t metric)
-{
-  m_metric = metric;
-}
-
 Ipv4RoutingTableEntry 
 Ipv4RoutingTableEntry::CreateHostRouteTo (Ipv4Address dest, 
                                           Ipv4Address nextHop,

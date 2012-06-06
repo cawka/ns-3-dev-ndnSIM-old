@@ -52,11 +52,6 @@ public:
  */
   static void DeleteGlobalRoutes ();
 
-  /**
-   * @breif Clear LSA database without removing any entry in global routing table
-   */
-  static void ClearLSDB ();
-  
 /**
  * @brief Build the routing database by gathering Link State Advertisements
  * from each node exporting a GlobalRouter interface.
