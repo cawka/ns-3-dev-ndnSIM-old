@@ -2012,37 +2012,33 @@ GlobalRouteManagerImpl::SPFIntraAddRouter (SPFVertex* v)
                 {
                   continue;
                 }
-
-              // There is no need to add additional host entries to global routing,
-              // the same entries are covered by stub network LSAs
-              
-              // Ptr<Ipv4GlobalRouting> gr = router->GetRoutingProtocol ();
-              // NS_ASSERT (gr);
-              // // walk through all available exit directions due to ECMP,
-              // // and add host route for each of the exit direction toward
-              // // the vertex 'v'
-              // for (uint32_t i = 0; i < v->GetNRootExitDirections (); i++)
-              //   {
-              //     SPFVertex::NodeExit_t exit = v->GetRootExitDirection (i);
-              //     Ipv4Address nextHop = exit.first;
-              //     int32_t outIf = exit.second;
-              //     if (outIf >= 0)
-              //       {
-              //         gr->AddRouteTo (lr->GetLinkData (), Ipv4Mask::GetOnes (), nextHop,
-              //                         outIf, v->GetDistanceFromRoot ());
-              //         NS_LOG_LOGIC ("(Route " << i << ") Node " << node->GetId () <<
-              //                       " adding host route to " << lr->GetLinkData () <<
-              //                       " using next hop " << nextHop <<
-              //                       " and outgoing interface " << outIf);
-              //       }
-              //     else
-              //       {
-              //         NS_LOG_LOGIC ("(Route " << i << ") Node " << node->GetId () <<
-              //                       " NOT able to add host route to " << lr->GetLinkData () <<
-              //                       " using next hop " << nextHop <<
-              //                       " since outgoing interface id is negative " << outIf);
-              //       }
-              //   } // for all routes from the root the vertex 'v'
+              Ptr<Ipv4GlobalRouting> gr = router->GetRoutingProtocol ();
+              NS_ASSERT (gr);
+              // walk through all available exit directions due to ECMP,
+              // and add host route for each of the exit direction toward
+              // the vertex 'v'
+              for (uint32_t i = 0; i < v->GetNRootExitDirections (); i++)
+                {
+                  SPFVertex::NodeExit_t exit = v->GetRootExitDirection (i);
+                  Ipv4Address nextHop = exit.first;
+                  int32_t outIf = exit.second;
+                  if (outIf >= 0)
+                    {
+                      gr->AddRouteTo (lr->GetLinkData (), Ipv4Mask::GetOnes (), nextHop,
+                                      outIf, v->GetDistanceFromRoot ());
+                      NS_LOG_LOGIC ("(Route " << i << ") Node " << node->GetId () <<
+                                    " adding host route to " << lr->GetLinkData () <<
+                                    " using next hop " << nextHop <<
+                                    " and outgoing interface " << outIf);
+                    }
+                  else
+                    {
+                      NS_LOG_LOGIC ("(Route " << i << ") Node " << node->GetId () <<
+                                    " NOT able to add host route to " << lr->GetLinkData () <<
+                                    " using next hop " << nextHop <<
+                                    " since outgoing interface id is negative " << outIf);
+                    }
+                } // for all routes from the root the vertex 'v'
             }
 //
 // Done adding the routes for the selected node.
