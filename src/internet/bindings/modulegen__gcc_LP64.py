@@ -200,6 +200,8 @@ def register_types(module):
     module.add_class('PcapHelperForIpv6', allow_subclassing=True)
     ## random-variable.h (module 'core'): ns3::RandomVariable [class]
     module.add_class('RandomVariable', import_from_module='ns.core')
+    ## rtt-estimator.h (module 'internet'): ns3::RttHistory [class]
+    module.add_class('RttHistory')
     ## global-route-manager-impl.h (module 'internet'): ns3::SPFVertex [class]
     module.add_class('SPFVertex')
     ## global-route-manager-impl.h (module 'internet'): ns3::SPFVertex::VertexType [enumeration]
@@ -370,6 +372,10 @@ def register_types(module):
     module.add_class('ParetoVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
     ## pcap-file-wrapper.h (module 'network'): ns3::PcapFileWrapper [class]
     module.add_class('PcapFileWrapper', import_from_module='ns.network', parent=root_module['ns3::Object'])
+    ## rtt-estimator.h (module 'internet'): ns3::RttEstimator [class]
+    module.add_class('RttEstimator', parent=root_module['ns3::Object'])
+    ## rtt-estimator.h (module 'internet'): ns3::RttMeanDeviation [class]
+    module.add_class('RttMeanDeviation', parent=root_module['ns3::RttEstimator'])
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::AttributeAccessor, ns3::empty, ns3::DefaultDeleter<ns3::AttributeAccessor> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::AttributeAccessor', 'ns3::empty', 'ns3::DefaultDeleter<ns3::AttributeAccessor>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::AttributeChecker, ns3::empty, ns3::DefaultDeleter<ns3::AttributeChecker> > [class]
@@ -607,6 +613,9 @@ def register_types(module):
     typehandlers.add_type_alias('ns3::SequenceNumber< unsigned int, int >', 'ns3::SequenceNumber32')
     typehandlers.add_type_alias('ns3::SequenceNumber< unsigned int, int >*', 'ns3::SequenceNumber32*')
     typehandlers.add_type_alias('ns3::SequenceNumber< unsigned int, int >&', 'ns3::SequenceNumber32&')
+    typehandlers.add_type_alias('std::deque< ns3::RttHistory, std::allocator< ns3::RttHistory > >', 'ns3::RttHistory_t')
+    typehandlers.add_type_alias('std::deque< ns3::RttHistory, std::allocator< ns3::RttHistory > >*', 'ns3::RttHistory_t*')
+    typehandlers.add_type_alias('std::deque< ns3::RttHistory, std::allocator< ns3::RttHistory > >&', 'ns3::RttHistory_t&')
     
     ## Register a nested module for the namespace FatalImpl
     
@@ -689,6 +698,7 @@ def register_methods(root_module):
     register_Ns3PcapHelperForIpv4_methods(root_module, root_module['ns3::PcapHelperForIpv4'])
     register_Ns3PcapHelperForIpv6_methods(root_module, root_module['ns3::PcapHelperForIpv6'])
     register_Ns3RandomVariable_methods(root_module, root_module['ns3::RandomVariable'])
+    register_Ns3RttHistory_methods(root_module, root_module['ns3::RttHistory'])
     register_Ns3SPFVertex_methods(root_module, root_module['ns3::SPFVertex'])
     register_Ns3SeedManager_methods(root_module, root_module['ns3::SeedManager'])
     register_Ns3SequenceNumber32_methods(root_module, root_module['ns3::SequenceNumber32'])
@@ -759,6 +769,8 @@ def register_methods(root_module):
     register_Ns3ObjectAggregateIterator_methods(root_module, root_module['ns3::Object::AggregateIterator'])
     register_Ns3ParetoVariable_methods(root_module, root_module['ns3::ParetoVariable'])
     register_Ns3PcapFileWrapper_methods(root_module, root_module['ns3::PcapFileWrapper'])
+    register_Ns3RttEstimator_methods(root_module, root_module['ns3::RttEstimator'])
+    register_Ns3RttMeanDeviation_methods(root_module, root_module['ns3::RttMeanDeviation'])
     register_Ns3SimpleRefCount__Ns3AttributeAccessor_Ns3Empty_Ns3DefaultDeleter__lt__ns3AttributeAccessor__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::AttributeAccessor, ns3::empty, ns3::DefaultDeleter<ns3::AttributeAccessor> >'])
     register_Ns3SimpleRefCount__Ns3AttributeChecker_Ns3Empty_Ns3DefaultDeleter__lt__ns3AttributeChecker__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::AttributeChecker, ns3::empty, ns3::DefaultDeleter<ns3::AttributeChecker> >'])
     register_Ns3SimpleRefCount__Ns3AttributeValue_Ns3Empty_Ns3DefaultDeleter__lt__ns3AttributeValue__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::AttributeValue, ns3::empty, ns3::DefaultDeleter<ns3::AttributeValue> >'])
@@ -1348,6 +1360,10 @@ def register_Ns3BufferIterator_methods(root_module, cls):
     cls.add_method('Next', 
                    'void', 
                    [param('uint32_t', 'delta')])
+    ## buffer.h (module 'network'): uint8_t ns3::Buffer::Iterator::PeekU8() [member function]
+    cls.add_method('PeekU8', 
+                   'uint8_t', 
+                   [])
     ## buffer.h (module 'network'): void ns3::Buffer::Iterator::Prev() [member function]
     cls.add_method('Prev', 
                    'void', 
@@ -1360,6 +1376,10 @@ def register_Ns3BufferIterator_methods(root_module, cls):
     cls.add_method('Read', 
                    'void', 
                    [param('uint8_t *', 'buffer'), param('uint32_t', 'size')])
+    ## buffer.h (module 'network'): void ns3::Buffer::Iterator::Read(ns3::Buffer::Iterator start, uint32_t size) [member function]
+    cls.add_method('Read', 
+                   'void', 
+                   [param('ns3::Buffer::Iterator', 'start'), param('uint32_t', 'size')])
     ## buffer.h (module 'network'): uint16_t ns3::Buffer::Iterator::ReadLsbtohU16() [member function]
     cls.add_method('ReadLsbtohU16', 
                    'uint16_t', 
@@ -3981,6 +4001,21 @@ def register_Ns3RandomVariable_methods(root_module, cls):
                    is_const=True)
     return
 
+def register_Ns3RttHistory_methods(root_module, cls):
+    ## rtt-estimator.h (module 'internet'): ns3::RttHistory::RttHistory(ns3::SequenceNumber32 s, uint32_t c, ns3::Time t) [constructor]
+    cls.add_constructor([param('ns3::SequenceNumber32', 's'), param('uint32_t', 'c'), param('ns3::Time', 't')])
+    ## rtt-estimator.h (module 'internet'): ns3::RttHistory::RttHistory(ns3::RttHistory const & h) [copy constructor]
+    cls.add_constructor([param('ns3::RttHistory const &', 'h')])
+    ## rtt-estimator.h (module 'internet'): ns3::RttHistory::count [variable]
+    cls.add_instance_attribute('count', 'uint32_t', is_const=False)
+    ## rtt-estimator.h (module 'internet'): ns3::RttHistory::retx [variable]
+    cls.add_instance_attribute('retx', 'bool', is_const=False)
+    ## rtt-estimator.h (module 'internet'): ns3::RttHistory::seq [variable]
+    cls.add_instance_attribute('seq', 'ns3::SequenceNumber32', is_const=False)
+    ## rtt-estimator.h (module 'internet'): ns3::RttHistory::time [variable]
+    cls.add_instance_attribute('time', 'ns3::Time', is_const=False)
+    return
+
 def register_Ns3SPFVertex_methods(root_module, cls):
     ## global-route-manager-impl.h (module 'internet'): ns3::SPFVertex::SPFVertex() [constructor]
     cls.add_constructor([])
@@ -4677,7 +4712,6 @@ def register_Ns3Empty_methods(root_module, cls):
 
 def register_Ns3Int64x64_t_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_inplace_numeric_operator('+=', param('ns3::int64x64_t const &', 'right'))
     cls.add_binary_numeric_operator('*', root_module['ns3::int64x64_t'], root_module['ns3::int64x64_t'], param('long long unsigned int const', 'right'))
     cls.add_binary_numeric_operator('*', root_module['ns3::int64x64_t'], root_module['ns3::int64x64_t'], param('long unsigned int const', 'right'))
     cls.add_binary_numeric_operator('*', root_module['ns3::int64x64_t'], root_module['ns3::int64x64_t'], param('unsigned int const', 'right'))
@@ -4730,6 +4764,7 @@ def register_Ns3Int64x64_t_methods(root_module, cls):
     cls.add_binary_comparison_operator('<')
     cls.add_binary_comparison_operator('>')
     cls.add_inplace_numeric_operator('*=', param('ns3::int64x64_t const &', 'right'))
+    cls.add_inplace_numeric_operator('+=', param('ns3::int64x64_t const &', 'right'))
     cls.add_inplace_numeric_operator('-=', param('ns3::int64x64_t const &', 'right'))
     cls.add_inplace_numeric_operator('/=', param('ns3::int64x64_t const &', 'right'))
     cls.add_output_stream_operator()
@@ -7187,6 +7222,126 @@ def register_Ns3PcapFileWrapper_methods(root_module, cls):
                    [])
     return
 
+def register_Ns3RttEstimator_methods(root_module, cls):
+    ## rtt-estimator.h (module 'internet'): ns3::RttEstimator::RttEstimator() [constructor]
+    cls.add_constructor([])
+    ## rtt-estimator.h (module 'internet'): ns3::RttEstimator::RttEstimator(ns3::RttEstimator const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::RttEstimator const &', 'arg0')])
+    ## rtt-estimator.h (module 'internet'): ns3::Time ns3::RttEstimator::AckSeq(ns3::SequenceNumber32 ackSeq) [member function]
+    cls.add_method('AckSeq', 
+                   'ns3::Time', 
+                   [param('ns3::SequenceNumber32', 'ackSeq')], 
+                   is_virtual=True)
+    ## rtt-estimator.h (module 'internet'): void ns3::RttEstimator::ClearSent() [member function]
+    cls.add_method('ClearSent', 
+                   'void', 
+                   [], 
+                   is_virtual=True)
+    ## rtt-estimator.h (module 'internet'): ns3::Ptr<ns3::RttEstimator> ns3::RttEstimator::Copy() const [member function]
+    cls.add_method('Copy', 
+                   'ns3::Ptr< ns3::RttEstimator >', 
+                   [], 
+                   is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## rtt-estimator.h (module 'internet'): ns3::Time ns3::RttEstimator::GetCurrentEstimate() const [member function]
+    cls.add_method('GetCurrentEstimate', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    ## rtt-estimator.h (module 'internet'): ns3::Time ns3::RttEstimator::GetMaxRto() const [member function]
+    cls.add_method('GetMaxRto', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    ## rtt-estimator.h (module 'internet'): ns3::Time ns3::RttEstimator::GetMinRto() const [member function]
+    cls.add_method('GetMinRto', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    ## rtt-estimator.h (module 'internet'): static ns3::TypeId ns3::RttEstimator::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## rtt-estimator.h (module 'internet'): void ns3::RttEstimator::IncreaseMultiplier() [member function]
+    cls.add_method('IncreaseMultiplier', 
+                   'void', 
+                   [], 
+                   is_virtual=True)
+    ## rtt-estimator.h (module 'internet'): void ns3::RttEstimator::Measurement(ns3::Time t) [member function]
+    cls.add_method('Measurement', 
+                   'void', 
+                   [param('ns3::Time', 't')], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## rtt-estimator.h (module 'internet'): void ns3::RttEstimator::Reset() [member function]
+    cls.add_method('Reset', 
+                   'void', 
+                   [], 
+                   is_virtual=True)
+    ## rtt-estimator.h (module 'internet'): void ns3::RttEstimator::ResetMultiplier() [member function]
+    cls.add_method('ResetMultiplier', 
+                   'void', 
+                   [], 
+                   is_virtual=True)
+    ## rtt-estimator.h (module 'internet'): ns3::Time ns3::RttEstimator::RetransmitTimeout() [member function]
+    cls.add_method('RetransmitTimeout', 
+                   'ns3::Time', 
+                   [], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## rtt-estimator.h (module 'internet'): void ns3::RttEstimator::SentSeq(ns3::SequenceNumber32 seq, uint32_t size) [member function]
+    cls.add_method('SentSeq', 
+                   'void', 
+                   [param('ns3::SequenceNumber32', 'seq'), param('uint32_t', 'size')], 
+                   is_virtual=True)
+    ## rtt-estimator.h (module 'internet'): void ns3::RttEstimator::SetCurrentEstimate(ns3::Time estimate) [member function]
+    cls.add_method('SetCurrentEstimate', 
+                   'void', 
+                   [param('ns3::Time', 'estimate')])
+    ## rtt-estimator.h (module 'internet'): void ns3::RttEstimator::SetMaxRto(ns3::Time maxRto) [member function]
+    cls.add_method('SetMaxRto', 
+                   'void', 
+                   [param('ns3::Time', 'maxRto')])
+    ## rtt-estimator.h (module 'internet'): void ns3::RttEstimator::SetMinRto(ns3::Time minRto) [member function]
+    cls.add_method('SetMinRto', 
+                   'void', 
+                   [param('ns3::Time', 'minRto')])
+    return
+
+def register_Ns3RttMeanDeviation_methods(root_module, cls):
+    ## rtt-estimator.h (module 'internet'): ns3::RttMeanDeviation::RttMeanDeviation() [constructor]
+    cls.add_constructor([])
+    ## rtt-estimator.h (module 'internet'): ns3::RttMeanDeviation::RttMeanDeviation(ns3::RttMeanDeviation const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::RttMeanDeviation const &', 'arg0')])
+    ## rtt-estimator.h (module 'internet'): ns3::Ptr<ns3::RttEstimator> ns3::RttMeanDeviation::Copy() const [member function]
+    cls.add_method('Copy', 
+                   'ns3::Ptr< ns3::RttEstimator >', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## rtt-estimator.h (module 'internet'): void ns3::RttMeanDeviation::Gain(double g) [member function]
+    cls.add_method('Gain', 
+                   'void', 
+                   [param('double', 'g')])
+    ## rtt-estimator.h (module 'internet'): static ns3::TypeId ns3::RttMeanDeviation::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## rtt-estimator.h (module 'internet'): void ns3::RttMeanDeviation::Measurement(ns3::Time measure) [member function]
+    cls.add_method('Measurement', 
+                   'void', 
+                   [param('ns3::Time', 'measure')], 
+                   is_virtual=True)
+    ## rtt-estimator.h (module 'internet'): void ns3::RttMeanDeviation::Reset() [member function]
+    cls.add_method('Reset', 
+                   'void', 
+                   [], 
+                   is_virtual=True)
+    ## rtt-estimator.h (module 'internet'): ns3::Time ns3::RttMeanDeviation::RetransmitTimeout() [member function]
+    cls.add_method('RetransmitTimeout', 
+                   'ns3::Time', 
+                   [], 
+                   is_virtual=True)
+    return
+
 def register_Ns3SimpleRefCount__Ns3AttributeAccessor_Ns3Empty_Ns3DefaultDeleter__lt__ns3AttributeAccessor__gt___methods(root_module, cls):
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::AttributeAccessor, ns3::empty, ns3::DefaultDeleter<ns3::AttributeAccessor> >::SimpleRefCount() [constructor]
     cls.add_constructor([])
@@ -8007,11 +8162,11 @@ def register_Ns3TcpSocketFactory_methods(root_module, cls):
 
 def register_Ns3Time_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_inplace_numeric_operator('+=', param('ns3::Time const &', 'right'))
     cls.add_binary_numeric_operator('+', root_module['ns3::Time'], root_module['ns3::Time'], param('ns3::Time const &', 'right'))
     cls.add_binary_numeric_operator('-', root_module['ns3::Time'], root_module['ns3::Time'], param('ns3::Time const &', 'right'))
     cls.add_binary_comparison_operator('<')
     cls.add_binary_comparison_operator('>')
+    cls.add_inplace_numeric_operator('+=', param('ns3::Time const &', 'right'))
     cls.add_inplace_numeric_operator('-=', param('ns3::Time const &', 'right'))
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('<=')
