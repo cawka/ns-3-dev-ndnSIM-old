@@ -3,7 +3,7 @@ import gtk
 import ns.core
 import ns.network
 import ns.internet
-import ns.NDNabstraction
+import ns.ndnSIM
 
 from visualizer.base import InformationWindow
 
@@ -61,7 +61,7 @@ class ShowCcnxFib(InformationWindow):
         self.visualizer.remove_information_window(self)
     
     def update(self):
-        ccnxFib = self.node.GetObject(ns.NDNabstraction.CcnxFib.GetTypeId())
+        ccnxFib = self.node.GetObject(ns.ndnSIM.CcnxFib.GetTypeId())
         
         if ccnxFib is None:
             return
