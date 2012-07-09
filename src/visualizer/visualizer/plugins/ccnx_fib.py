@@ -61,19 +61,20 @@ class ShowCcnxFib(InformationWindow):
         self.visualizer.remove_information_window(self)
     
     def update(self):
-        ccnxFib = self.node.GetObject(ns.ndnSIM.CcnxFib.GetTypeId())
+        ccnxFib = ns.ndnSIM.CcnxFib.GetCcnxFib (self.node)
         
         if ccnxFib is None:
             return
 
         self.table_model.clear()
         
-        for fibI in range(ccnxFib.GetCcnxFibEntryCount()):
-            entry = ccnxFib.GetCcnxFibEntry(fibI)
+        item = ccnxFib.Begin ()
+        while (item != ccnxFib.End ()):
             tree_iter = self.table_model.append()
             self.table_model.set(tree_iter,
-                                 self.COLUMN_PREFIX, str(entry.GetPrefix()),
-                                 self.COLUMN_FACE, str(entry))
+                                 self.COLUMN_PREFIX, str(item.GetPrefix()),
+                                 self.COLUMN_FACE, str(item))
+            item = ccnxFib.Next (item)
 
 def populate_node_menu(viz, node, menu):
     menu_item = gtk.MenuItem("Show CCNx FIB")
