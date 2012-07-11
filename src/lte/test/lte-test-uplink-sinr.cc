@@ -154,14 +154,14 @@ LteUplinkSinrTestCase::DoRun (void)
   int numOfPkts = 10;
 
   // Packet bursts
-  Ptr<PacketBurst> packetBursts[numOfPbs];
+  Ptr<PacketBurst> *packetBursts = new Ptr<PacketBurst>[numOfPbs];
 
   // Packets
-  Ptr<Packet> pkt[numOfPbs][numOfPkts];
+  Ptr<Packet> **pkt = new Ptr<Packet>* [numOfPbs];
+  for (int i = 0; i < numOfPbs; i++) pkt[i] = new Ptr<Packet> [numOfPkts];
 
   // Phy tags
-  LtePhyTag pktTag[numOfPbs];
-
+  LtePhyTag *pktTag = new LtePhyTag [numOfPbs];
 
   /**
    * Build packet burst (Data and interference)
@@ -304,8 +304,12 @@ LteUplinkSinrTestCase::DoRun (void)
   
   NS_TEST_ASSERT_MSG_SPECTRUM_VALUE_EQ_TOL (calculatedSinr, *m_sinr, 0.0000001, "Wrong SINR !");
   ulPhy->Dispose ();
-  Simulator::Destroy ();
-  
+  Simulator::Destroy ();  
+
+  delete [] pktTag;
+  for (int i = 0; i < numOfPbs; i++) delete [] pkt[i];
+  delete [] pkt;
+  delete [] packetBursts;
 }
 
 } // namespace ns3
