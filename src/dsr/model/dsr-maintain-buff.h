@@ -103,6 +103,7 @@ public:
       m_src (s),
       m_dst (dst),
       m_ackId (ackId),
+      m_id (0),
       m_segsLeft (segs),
       m_expire (exp + Simulator::Now ())
   {
@@ -157,6 +158,14 @@ public:
   void SetAckId (uint16_t ackId)
   {
     m_ackId = ackId;
+  }
+  uint16_t GetId () const
+  {
+    return m_id;
+  }
+  void SetId (uint16_t id)
+  {
+    m_id = id;
   }
   uint8_t GetSegsLeft () const
   {
