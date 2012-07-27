@@ -68,8 +68,8 @@ def register_types(module):
     module.add_class('Rectangle')
     ## rectangle.h (module 'mobility'): ns3::Rectangle::Side [enumeration]
     module.add_enum('Side', ['RIGHT', 'LEFT', 'TOP', 'BOTTOM'], outer_class=root_module['ns3::Rectangle'])
-    ## random-variable.h (module 'core'): ns3::SeedManager [class]
-    module.add_class('SeedManager', import_from_module='ns.core')
+    ## rng-seed-manager.h (module 'core'): ns3::RngSeedManager [class]
+    module.add_class('RngSeedManager', import_from_module='ns.core')
     ## random-variable.h (module 'core'): ns3::SequentialVariable [class]
     module.add_class('SequentialVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Object, ns3::ObjectBase, ns3::ObjectDeleter> [class]
@@ -266,14 +266,18 @@ def register_types(module):
     module.add_class('GaussMarkovMobilityModel', parent=root_module['ns3::MobilityModel'])
     ## hierarchical-mobility-model.h (module 'mobility'): ns3::HierarchicalMobilityModel [class]
     module.add_class('HierarchicalMobilityModel', parent=root_module['ns3::MobilityModel'])
-    typehandlers.add_type_alias('ns3::Vector3DValue', 'ns3::VectorValue')
-    typehandlers.add_type_alias('ns3::Vector3DValue*', 'ns3::VectorValue*')
-    typehandlers.add_type_alias('ns3::Vector3DValue&', 'ns3::VectorValue&')
-    module.add_typedef(root_module['ns3::Vector3DValue'], 'VectorValue')
     typehandlers.add_type_alias('ns3::Vector3D', 'ns3::Vector')
     typehandlers.add_type_alias('ns3::Vector3D*', 'ns3::Vector*')
     typehandlers.add_type_alias('ns3::Vector3D&', 'ns3::Vector&')
     module.add_typedef(root_module['ns3::Vector3D'], 'Vector')
+    typehandlers.add_type_alias('ns3::RngSeedManager', 'ns3::SeedManager')
+    typehandlers.add_type_alias('ns3::RngSeedManager*', 'ns3::SeedManager*')
+    typehandlers.add_type_alias('ns3::RngSeedManager&', 'ns3::SeedManager&')
+    module.add_typedef(root_module['ns3::RngSeedManager'], 'SeedManager')
+    typehandlers.add_type_alias('ns3::Vector3DValue', 'ns3::VectorValue')
+    typehandlers.add_type_alias('ns3::Vector3DValue*', 'ns3::VectorValue*')
+    typehandlers.add_type_alias('ns3::Vector3DValue&', 'ns3::VectorValue&')
+    module.add_typedef(root_module['ns3::Vector3DValue'], 'VectorValue')
     typehandlers.add_type_alias('ns3::Vector3DChecker', 'ns3::VectorChecker')
     typehandlers.add_type_alias('ns3::Vector3DChecker*', 'ns3::VectorChecker*')
     typehandlers.add_type_alias('ns3::Vector3DChecker&', 'ns3::VectorChecker&')
@@ -309,7 +313,7 @@ def register_methods(root_module):
     register_Ns3ObjectFactory_methods(root_module, root_module['ns3::ObjectFactory'])
     register_Ns3RandomVariable_methods(root_module, root_module['ns3::RandomVariable'])
     register_Ns3Rectangle_methods(root_module, root_module['ns3::Rectangle'])
-    register_Ns3SeedManager_methods(root_module, root_module['ns3::SeedManager'])
+    register_Ns3RngSeedManager_methods(root_module, root_module['ns3::RngSeedManager'])
     register_Ns3SequentialVariable_methods(root_module, root_module['ns3::SequentialVariable'])
     register_Ns3SimpleRefCount__Ns3Object_Ns3ObjectBase_Ns3ObjectDeleter_methods(root_module, root_module['ns3::SimpleRefCount< ns3::Object, ns3::ObjectBase, ns3::ObjectDeleter >'])
     register_Ns3TagBuffer_methods(root_module, root_module['ns3::TagBuffer'])
@@ -1375,32 +1379,32 @@ def register_Ns3Rectangle_methods(root_module, cls):
     cls.add_instance_attribute('yMin', 'double', is_const=False)
     return
 
-def register_Ns3SeedManager_methods(root_module, cls):
-    ## random-variable.h (module 'core'): ns3::SeedManager::SeedManager() [constructor]
+def register_Ns3RngSeedManager_methods(root_module, cls):
+    ## rng-seed-manager.h (module 'core'): ns3::RngSeedManager::RngSeedManager() [constructor]
     cls.add_constructor([])
-    ## random-variable.h (module 'core'): ns3::SeedManager::SeedManager(ns3::SeedManager const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::SeedManager const &', 'arg0')])
-    ## random-variable.h (module 'core'): static bool ns3::SeedManager::CheckSeed(uint32_t seed) [member function]
-    cls.add_method('CheckSeed', 
-                   'bool', 
-                   [param('uint32_t', 'seed')], 
-                   is_static=True)
-    ## random-variable.h (module 'core'): static uint32_t ns3::SeedManager::GetRun() [member function]
-    cls.add_method('GetRun', 
-                   'uint32_t', 
+    ## rng-seed-manager.h (module 'core'): ns3::RngSeedManager::RngSeedManager(ns3::RngSeedManager const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::RngSeedManager const &', 'arg0')])
+    ## rng-seed-manager.h (module 'core'): static uint64_t ns3::RngSeedManager::GetNextStreamIndex() [member function]
+    cls.add_method('GetNextStreamIndex', 
+                   'uint64_t', 
                    [], 
                    is_static=True)
-    ## random-variable.h (module 'core'): static uint32_t ns3::SeedManager::GetSeed() [member function]
+    ## rng-seed-manager.h (module 'core'): static uint64_t ns3::RngSeedManager::GetRun() [member function]
+    cls.add_method('GetRun', 
+                   'uint64_t', 
+                   [], 
+                   is_static=True)
+    ## rng-seed-manager.h (module 'core'): static uint32_t ns3::RngSeedManager::GetSeed() [member function]
     cls.add_method('GetSeed', 
                    'uint32_t', 
                    [], 
                    is_static=True)
-    ## random-variable.h (module 'core'): static void ns3::SeedManager::SetRun(uint32_t run) [member function]
+    ## rng-seed-manager.h (module 'core'): static void ns3::RngSeedManager::SetRun(uint64_t run) [member function]
     cls.add_method('SetRun', 
                    'void', 
-                   [param('uint32_t', 'run')], 
+                   [param('uint64_t', 'run')], 
                    is_static=True)
-    ## random-variable.h (module 'core'): static void ns3::SeedManager::SetSeed(uint32_t seed) [member function]
+    ## rng-seed-manager.h (module 'core'): static void ns3::RngSeedManager::SetSeed(uint32_t seed) [member function]
     cls.add_method('SetSeed', 
                    'void', 
                    [param('uint32_t', 'seed')], 
@@ -1698,12 +1702,25 @@ def register_Ns3UniformVariable_methods(root_module, cls):
 
 def register_Ns3Vector2D_methods(root_module, cls):
     cls.add_output_stream_operator()
+    cls.add_binary_numeric_operator('*', root_module['ns3::Vector2D'], root_module['ns3::Vector2D'], param('ns3::Vector2D const &', 'right'))
+    cls.add_binary_numeric_operator('*', root_module['ns3::Vector2D'], root_module['ns3::Vector2D'], param('double', 'right'))
+    cls.add_binary_numeric_operator('+', root_module['ns3::Vector2D'], root_module['ns3::Vector2D'], param('ns3::Vector2D const &', 'right'))
+    cls.add_binary_numeric_operator('+', root_module['ns3::Vector2D'], root_module['ns3::Vector2D'], param('double', 'right'))
+    cls.add_inplace_numeric_operator('+=', param('ns3::Vector2D const &', 'right'))
+    cls.add_inplace_numeric_operator('+=', param('double', 'right'))
+    cls.add_binary_numeric_operator('-', root_module['ns3::Vector2D'], root_module['ns3::Vector2D'], param('ns3::Vector2D const &', 'right'))
+    cls.add_binary_numeric_operator('/', root_module['ns3::Vector2D'], root_module['ns3::Vector2D'], param('double', 'right'))
     ## vector.h (module 'core'): ns3::Vector2D::Vector2D(ns3::Vector2D const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::Vector2D const &', 'arg0')])
     ## vector.h (module 'core'): ns3::Vector2D::Vector2D(double _x, double _y) [constructor]
     cls.add_constructor([param('double', '_x'), param('double', '_y')])
     ## vector.h (module 'core'): ns3::Vector2D::Vector2D() [constructor]
     cls.add_constructor([])
+    ## vector.h (module 'core'): double ns3::Vector2D::GetLength() const [member function]
+    cls.add_method('GetLength', 
+                   'double', 
+                   [], 
+                   is_const=True)
     ## vector.h (module 'core'): ns3::Vector2D::x [variable]
     cls.add_instance_attribute('x', 'double', is_const=False)
     ## vector.h (module 'core'): ns3::Vector2D::y [variable]
@@ -1712,12 +1729,25 @@ def register_Ns3Vector2D_methods(root_module, cls):
 
 def register_Ns3Vector3D_methods(root_module, cls):
     cls.add_output_stream_operator()
+    cls.add_binary_numeric_operator('*', root_module['ns3::Vector3D'], root_module['ns3::Vector3D'], param('ns3::Vector3D const &', 'right'))
+    cls.add_binary_numeric_operator('*', root_module['ns3::Vector3D'], root_module['ns3::Vector3D'], param('double', 'right'))
+    cls.add_binary_numeric_operator('+', root_module['ns3::Vector3D'], root_module['ns3::Vector3D'], param('ns3::Vector3D const &', 'right'))
+    cls.add_binary_numeric_operator('+', root_module['ns3::Vector3D'], root_module['ns3::Vector3D'], param('double', 'right'))
+    cls.add_inplace_numeric_operator('+=', param('ns3::Vector3D const &', 'right'))
+    cls.add_inplace_numeric_operator('+=', param('double', 'right'))
+    cls.add_binary_numeric_operator('-', root_module['ns3::Vector3D'], root_module['ns3::Vector3D'], param('ns3::Vector3D const &', 'right'))
+    cls.add_binary_numeric_operator('/', root_module['ns3::Vector3D'], root_module['ns3::Vector3D'], param('double', 'right'))
     ## vector.h (module 'core'): ns3::Vector3D::Vector3D(ns3::Vector3D const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::Vector3D const &', 'arg0')])
     ## vector.h (module 'core'): ns3::Vector3D::Vector3D(double _x, double _y, double _z) [constructor]
     cls.add_constructor([param('double', '_x'), param('double', '_y'), param('double', '_z')])
     ## vector.h (module 'core'): ns3::Vector3D::Vector3D() [constructor]
     cls.add_constructor([])
+    ## vector.h (module 'core'): double ns3::Vector3D::GetLength() const [member function]
+    cls.add_method('GetLength', 
+                   'double', 
+                   [], 
+                   is_const=True)
     ## vector.h (module 'core'): ns3::Vector3D::x [variable]
     cls.add_instance_attribute('x', 'double', is_const=False)
     ## vector.h (module 'core'): ns3::Vector3D::y [variable]
@@ -2011,6 +2041,11 @@ def register_Ns3Object_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_const=True, is_virtual=True)
+    ## object.h (module 'core'): ns3::Ptr<ns3::MobilityModel> ns3::Object::GetObject() const [member function]
+    cls.add_method('GetObject', 
+                   'ns3::Ptr< ns3::MobilityModel >', 
+                   [], 
+                   is_const=True, template_parameters=['ns3::MobilityModel'])
     ## object.h (module 'core'): static ns3::TypeId ns3::Object::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
@@ -2947,6 +2982,11 @@ def register_Ns3MobilityModel_methods(root_module, cls):
                    'double', 
                    [param('ns3::Ptr< ns3::MobilityModel const >', 'position')], 
                    is_const=True)
+    ## mobility-model.h (module 'mobility'): static ns3::Ptr<ns3::MobilityModel> ns3::MobilityModel::GetMobilityModel(ns3::Ptr<ns3::Object> node) [member function]
+    cls.add_method('GetMobilityModel', 
+                   'ns3::Ptr< ns3::MobilityModel >', 
+                   [param('ns3::Ptr< ns3::Object >', 'node')], 
+                   is_static=True)
     ## mobility-model.h (module 'mobility'): ns3::Vector ns3::MobilityModel::GetPosition() const [member function]
     cls.add_method('GetPosition', 
                    'ns3::Vector', 

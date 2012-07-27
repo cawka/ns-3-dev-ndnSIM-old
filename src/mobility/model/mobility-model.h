@@ -66,6 +66,9 @@ public:
    */
   double GetRelativeSpeed (Ptr<const MobilityModel> other) const;
 
+  static inline Ptr<MobilityModel>
+  GetMobilityModel (Ptr<Object> node);
+
 protected:
   /**
    * Must be invoked by subclasses when the course of the
@@ -102,6 +105,13 @@ private:
   TracedCallback<Ptr<const MobilityModel> > m_courseChangeTrace;
 
 };
+
+Ptr<MobilityModel>
+MobilityModel::GetMobilityModel (Ptr<Object> node)
+{
+  return node->GetObject<MobilityModel> ();
+}
+
 
 } // namespace ns3
 
