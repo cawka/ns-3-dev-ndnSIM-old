@@ -7,7 +7,7 @@ import ns.ndnSIM
 
 from visualizer.base import InformationWindow
 
-class ShowCcnxFib(InformationWindow):
+class ShowNdnFib(InformationWindow):
     (
         COLUMN_PREFIX,
         COLUMN_FACE
@@ -23,7 +23,7 @@ class ShowCcnxFib(InformationWindow):
         self.node = ns.network.NodeList.GetNode (node_index)
         node_name = ns.core.Names.FindName (self.node)
 
-        title = "CCNx FIB for node %i" % node_index
+        title = "Ndn FIB for node %i" % node_index
         if len(node_name) != 0:
             title += " (" + str(node_name) + ")"
 
@@ -61,29 +61,29 @@ class ShowCcnxFib(InformationWindow):
         self.visualizer.remove_information_window(self)
     
     def update(self):
-        ccnxFib = ns.ndnSIM.CcnxFib.GetCcnxFib (self.node)
+        ndnFib = ns.ndnSIM.ndn.Fib.GetFib (self.node)
         
-        if ccnxFib is None:
+        if ndnFib is None:
             return
 
         self.table_model.clear()
         
-        item = ccnxFib.Begin ()
-        while (item != ccnxFib.End ()):
+        item = ndnFib.Begin ()
+        while (item != ndnFib.End ()):
             tree_iter = self.table_model.append()
             self.table_model.set(tree_iter,
                                  self.COLUMN_PREFIX, str(item.GetPrefix()),
                                  self.COLUMN_FACE, str(item))
-            item = ccnxFib.Next (item)
+            item = ndnFib.Next (item)
 
 def populate_node_menu(viz, node, menu):
-    menu_item = gtk.MenuItem("Show CCNx FIB")
+    menu_item = gtk.MenuItem("Show NDN FIB")
     menu_item.show()
 
-    def _show_ccnx_fib(dummy_menu_item):
-        ShowCcnxFib(viz, node.node_index)
+    def _show_ndn_fib(dummy_menu_item):
+        ShowNdnFib(viz, node.node_index)
 
-    menu_item.connect("activate", _show_ccnx_fib)
+    menu_item.connect("activate", _show_ndn_fib)
     menu.add(menu_item)
 
 def register(viz):
