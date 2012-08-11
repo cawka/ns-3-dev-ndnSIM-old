@@ -4,7 +4,7 @@ from __future__ import division
 
 LAYOUT_ALGORITHM = 'neato' # ['neato'|'dot'|'twopi'|'circo'|'fdp'|'nop']
 REPRESENT_CHANNELS_AS_NODES = 1
-DEFAULT_NODE_SIZE = 3.0 # default node size in meters
+DEFAULT_NODE_SIZE = 2.0 # default node size in meters
 DEFAULT_TRANSMISSIONS_MEMORY = 5 # default number of of past intervals whose transmissions are remembered
 BITRATE_FONT_SIZE = 10
 
@@ -95,7 +95,13 @@ class Node(PyVizObject):
         self.svg_item = None
         self.svg_align_x = None
         self.svg_align_y = None
-        self._label = None
+
+        ns3_node = ns.network.NodeList.GetNode(self.node_index)
+        
+        self._label = '%i' % self.node_index
+        node_name = ns.core.Names.FindName (ns3_node)
+        if len(node_name)!=0:
+            self._label += ' (' + node_name + ')'
         self._label_canvas_item = None
 
         self._update_appearance() # call this last
@@ -257,8 +263,8 @@ class Node(PyVizObject):
 
         if self._label is not None:
             if self._label_canvas_item is None:
-                self._label_canvas_item = goocanvas.Text(visibility_threshold=0.5,
-                                                         font="Sans Serif 10",
+                self._label_canvas_item = goocanvas.Text(visibility_threshold=0.2,
+                                                         font="Sans Serif 6",
                                                          fill_color_rgba=0x808080ff,
                                                          alignment=pango.ALIGN_CENTER,
                                                          anchor=gtk.ANCHOR_N,
