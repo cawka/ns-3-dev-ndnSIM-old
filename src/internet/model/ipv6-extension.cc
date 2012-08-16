@@ -347,7 +347,7 @@ uint8_t Ipv6ExtensionFragment::Process (Ptr<Packet>& packet, uint8_t offset, Ipv
   uint32_t identification = fragmentHeader.GetIdentification ();
   Ipv6Address src = ipv6Header.GetSourceAddress ();
 
-  std::pair<Ipv6Address, uint32_t> fragmentsId = std::make_pair<Ipv6Address, uint32_t> (src, identification);
+  std::pair<Ipv6Address, uint32_t> fragmentsId = std::make_pair (src, identification);
   Ptr<Fragments> fragments;
 
   Ipv6Header ipHeader = ipv6Header;
@@ -611,7 +611,7 @@ void Ipv6ExtensionFragment::Fragments::AddFragment (Ptr<Packet> fragment, uint16
       m_moreFragment = moreFragment;
     }
 
-  m_packetFragments.insert (it, std::make_pair<Ptr<Packet>, uint16_t> (fragment, fragmentOffset));
+  m_packetFragments.insert (it, std::make_pair (fragment, fragmentOffset));
 }
 
 void Ipv6ExtensionFragment::Fragments::SetUnfragmentablePart (Ptr<Packet> unfragmentablePart)

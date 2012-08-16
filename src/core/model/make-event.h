@@ -62,7 +62,9 @@ EventImpl * MakeEvent (void (*f)(U1,U2,U3,U4,U5), T1 a1, T2 a2, T3 a3, T4 a4, T5
 namespace ns3 {
 
 template <typename T>
-struct EventMemberImplObjTraits;
+struct EventMemberImplObjTraits
+{
+};
 
 template <typename T>
 struct EventMemberImplObjTraits<T *>

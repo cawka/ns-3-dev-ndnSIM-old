@@ -264,18 +264,6 @@ private:
   void CleanupBuffers (void);
   void InactivityTimeout (Mac48Address, uint8_t);
 
-  struct Item;
-  typedef std::list<Item> PacketQueue;
-  typedef std::list<Item>::iterator PacketQueueI;
-  typedef std::list<Item>::const_iterator PacketQueueCI;
-
-  typedef std::map<std::pair<Mac48Address, uint8_t>,
-                   std::pair<OriginatorBlockAckAgreement, PacketQueue> > Agreements;
-  typedef std::map<std::pair<Mac48Address, uint8_t>,
-                   std::pair<OriginatorBlockAckAgreement, PacketQueue> >::iterator AgreementsI;
-  typedef std::map<std::pair<Mac48Address, uint8_t>,
-                   std::pair<OriginatorBlockAckAgreement, PacketQueue> >::const_iterator AgreementsCI;
-
   struct Item
   {
     Item ();
@@ -286,6 +274,17 @@ private:
     WifiMacHeader hdr;
     Time timestamp;
   };
+
+  typedef std::list<Item> PacketQueue;
+  typedef std::list<Item>::iterator PacketQueueI;
+  typedef std::list<Item>::const_iterator PacketQueueCI;
+
+  typedef std::map<std::pair<Mac48Address, uint8_t>,
+                   std::pair<OriginatorBlockAckAgreement, PacketQueue> > Agreements;
+  typedef std::map<std::pair<Mac48Address, uint8_t>,
+                   std::pair<OriginatorBlockAckAgreement, PacketQueue> >::iterator AgreementsI;
+  typedef std::map<std::pair<Mac48Address, uint8_t>,
+                   std::pair<OriginatorBlockAckAgreement, PacketQueue> >::const_iterator AgreementsCI;
 
   /**
    * This data structure contains, for each block ack agreement (recipient, tid), a set of packets
