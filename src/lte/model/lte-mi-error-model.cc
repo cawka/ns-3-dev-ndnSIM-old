@@ -31,7 +31,7 @@
 
 
 #include <list>
-#include <tr1/functional>
+#include <functional>
 #include <vector>
 #include <ns3/log.h>
 #include <ns3/pointer.h>

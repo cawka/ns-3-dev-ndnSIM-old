@@ -121,15 +121,6 @@ public:
   bool IsEmpty (void);
   uint32_t GetSize (void);
 private:
-  struct Item;
-
-  typedef std::list<struct Item> PacketQueue;
-  typedef std::list<struct Item>::reverse_iterator PacketQueueRI;
-  typedef std::list<struct Item>::iterator PacketQueueI;
-
-  void Cleanup (void);
-  Mac48Address GetAddressForPacket (enum WifiMacHeader::AddressType type, PacketQueueI);
-
   struct Item
   {
     Item (Ptr<const Packet> packet,
@@ -139,6 +130,13 @@ private:
     WifiMacHeader hdr;
     Time tstamp;
   };
+
+  typedef std::list<struct Item> PacketQueue;
+  typedef std::list<struct Item>::reverse_iterator PacketQueueRI;
+  typedef std::list<struct Item>::iterator PacketQueueI;
+
+  void Cleanup (void);
+  Mac48Address GetAddressForPacket (enum WifiMacHeader::AddressType type, PacketQueueI);
 
   PacketQueue m_queue;
   WifiMacParameters *m_parameters;
