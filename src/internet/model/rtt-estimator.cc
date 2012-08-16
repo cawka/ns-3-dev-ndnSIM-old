@@ -308,8 +308,8 @@ Time RttMeanDeviation::RetransmitTimeout ()
   //if (nSamples < 2) return est * 2;
 
   double retval = std::min (m_maxRto.ToDouble (Time::S),
-                            std::max (m_minRto.ToDouble (Time::S),
-                                      m_currentEstimatedRtt.ToDouble (Time::S) + 4 * m_variance.ToDouble (Time::S)));
+                            std::max (m_multiplier*m_minRto.ToDouble (Time::S),
+                                      m_multiplier*(m_currentEstimatedRtt.ToDouble (Time::S) + 4 * m_variance.ToDouble (Time::S))));
    
   // NS_LOG_DEBUG ("RetransmitTimeout:  var " << var << " est " << m_currentEstimatedRtt.ToDouble (Time::S) << " multiplier " << m_multiplier);
   // if (var < (m_currentEstimatedRtt.ToDouble (Time::S) / 4.0) )
