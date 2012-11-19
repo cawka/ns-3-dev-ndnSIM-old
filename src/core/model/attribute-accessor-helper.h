@@ -28,14 +28,14 @@ namespace ns3 {
  * \ingroup AttributeHelper
  */
 template <typename V, typename T1>
-Ptr<const AttributeAccessor>
+inline Ptr<const AttributeAccessor>
 MakeAccessorHelper (T1 a1);
 
 /**
  * \ingroup AttributeHelper
  */
 template <typename V, typename T1, typename T2>
-Ptr<const AttributeAccessor>
+inline Ptr<const AttributeAccessor>
 MakeAccessorHelper (T1 a1, T2 a2);
 
 } // namespace ns3
@@ -94,7 +94,7 @@ private:
 };
 
 template <typename V, typename T, typename U>
-Ptr<const AttributeAccessor>
+inline Ptr<const AttributeAccessor>
 DoMakeAccessorHelperOne (U T::*memberVariable)
 {
   class MemberVariable : public AccessorHelper<T,V>
@@ -132,7 +132,7 @@ private:
 }
 
 template <typename V, typename T, typename U>
-Ptr<const AttributeAccessor>
+inline Ptr<const AttributeAccessor>
 DoMakeAccessorHelperOne (U (T::*getter)(void) const)
 {
   class MemberMethod : public AccessorHelper<T,V>
@@ -163,7 +163,7 @@ private:
 
 
 template <typename V, typename T, typename U>
-Ptr<const AttributeAccessor>
+inline Ptr<const AttributeAccessor>
 DoMakeAccessorHelperOne (void (T::*setter)(U))
 {
   class MemberMethod : public AccessorHelper<T,V>
