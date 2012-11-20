@@ -765,7 +765,7 @@ class Visualizer(gobject.GObject):
         seen_nodes = 0
         for nodeI in range(self.last_discoverd_node, ns.network.NodeList.GetNNodes()):
             seen_nodes += 1
-            if seen_nodes == 100:
+            if seen_nodes > 100:
                 print "scan topology... %i nodes visited (%.1f%%)" % (nodeI, 100*nodeI/ns.network.NodeList.GetNNodes())
                 seen_nodes = 0
             node = ns.network.NodeList.GetNode(nodeI)
@@ -773,6 +773,7 @@ class Visualizer(gobject.GObject):
             node_view = self.get_node(nodeI)
 
             mobility = ns.mobility.MobilityModel.GetMobilityModel (node)
+
             # print "Mobility type: " + mobility.GetInstanceTypeId().GetName()
             if mobility is not None:
                 node_view.set_color("red")
@@ -796,6 +797,7 @@ class Visualizer(gobject.GObject):
                         if mobility is None:
                             channel_name = "Channel %s" % id(channel)
                             graph.add_edge(node_name, channel_name)
+
                         self.get_channel(channel)
                         self.create_link(self.get_node(nodeI), self.get_channel(channel))
                     else:
@@ -814,10 +816,15 @@ class Visualizer(gobject.GObject):
                         otherDev = channel.GetDevice(otherDevI)
                         otherNode = otherDev.GetNode()
                         otherNodeView = self.get_node(otherNode.GetId())
+
                         if otherNode is not node:
-                            if mobility is None and not otherNodeView.has_mobility:
+                            if os.environ.get ('NS_VIS_ASSIGN') is not None:
                                 other_node_name = "Node %i" % otherNode.GetId()
                                 graph.add_edge(node_name, other_node_name)
+                            else:
+                                if mobility is None and not otherNodeView.has_mobility:
+                                    other_node_name = "Node %i" % otherNode.GetId()
+                                    graph.add_edge(node_name, other_node_name)
                             self.create_link(self.get_node(nodeI), otherNodeView)
 
         # print "scanning topology: calling graphviz layout"
@@ -828,8 +835,19 @@ class Visualizer(gobject.GObject):
             pos_x, pos_y = [float(s) for s in node.attr['pos'].split(',')]
             if node_type == 'Node':
                 obj = self.nodes[int(node_id)]
+
+                # If node reordering is requested
+                if os.environ.get ('NS_VIS_ASSIGN') is not None:
+                    node = ns.network.NodeList.GetNode(int(node_id))
+                    mobility = ns.mobility.MobilityModel.GetMobilityModel (node)
+                    if mobility is not None:
+                        pos = ns.core.Vector (pos_x, pos_y, 0)
+                        mobility.SetPosition (pos)
+
+
             elif node_type == 'Channel':
                 obj = self.channels[int(node_id)]
+
             obj.set_position(pos_x, pos_y)
 
         # print "scanning topology: all done."
