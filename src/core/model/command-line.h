@@ -88,6 +88,14 @@ public:
    * will attempt to handle them all.
    */
   void Parse (int argc, char *argv[]) const;
+
+  void PrintHelp (std::ostream &os) const;
+  void PrintGlobals (std::ostream &os) const;
+  void PrintAttributes (std::ostream &os, std::string type) const;
+  void PrintGroup (std::ostream &os, std::string group) const;
+  void PrintTypeIds (std::ostream &os) const;
+  void PrintGroups (std::ostream &os) const;
+
 private:
   class Item 
   {
@@ -112,12 +120,6 @@ public:
   };
 
   void HandleArgument (std::string name, std::string value) const;
-  void PrintHelp (void) const;
-  void PrintGlobals (void) const;
-  void PrintAttributes (std::string type) const;
-  void PrintGroup (std::string group) const;
-  void PrintTypeIds (void) const;
-  void PrintGroups (void) const;
   void Copy (const CommandLine &cmd);
   void Clear (void);
 
@@ -150,6 +152,13 @@ CommandLine::UserItem<T>::Parse (std::string value)
   iss.str (value);
   iss >> (*m_valuePtr);
   return !iss.bad () && !iss.fail ();
+}
+
+inline std::ostream &
+operator << (std::ostream &os, const CommandLine &cmd)
+{
+  cmd.PrintHelp (os);
+  return os;
 }
 
 } // namespace ns3

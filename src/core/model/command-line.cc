@@ -116,40 +116,40 @@ CommandLine::Parse (int iargc, char *argv[]) const
 }
 
 void
-CommandLine::PrintHelp (void) const
+CommandLine::PrintHelp (std::ostream &os) const
 {
-  std::cout << "--PrintHelp: Print this help message." << std::endl;
-  std::cout << "--PrintGroups: Print the list of groups." << std::endl;
-  std::cout << "--PrintTypeIds: Print all TypeIds." << std::endl;
-  std::cout << "--PrintGroup=[group]: Print all TypeIds of group." << std::endl;
-  std::cout << "--PrintAttributes=[typeid]: Print all attributes of typeid." << std::endl;
-  std::cout << "--PrintGlobals: Print the list of globals." << std::endl;
+  os << "--PrintHelp: Print this help message." << std::endl;
+  os << "--PrintGroups: Print the list of groups." << std::endl;
+  os << "--PrintTypeIds: Print all TypeIds." << std::endl;
+  os << "--PrintGroup=[group]: Print all TypeIds of group." << std::endl;
+  os << "--PrintAttributes=[typeid]: Print all attributes of typeid." << std::endl;
+  os << "--PrintGlobals: Print the list of globals." << std::endl;
   if (!m_items.empty ())
     {
-      std::cout << "User Arguments:" << std::endl;
+      os << "User Arguments:" << std::endl;
       for (Items::const_iterator i = m_items.begin (); i != m_items.end (); ++i)
         {
-          std::cout << "    --" << (*i)->m_name << ": " << (*i)->m_help << std::endl;
+          os << "    --" << (*i)->m_name << ": " << (*i)->m_help << std::endl;
         }
     }
 }
 
 void
-CommandLine::PrintGlobals (void) const
+CommandLine::PrintGlobals (std::ostream &os) const
 {
   for (GlobalValue::Iterator i = GlobalValue::Begin (); i != GlobalValue::End (); ++i)
     {
-      std::cout << "    --" << (*i)->GetName () << "=[";
+      os << "    --" << (*i)->GetName () << "=[";
       Ptr<const AttributeChecker> checker = (*i)->GetChecker ();
       StringValue v;
       (*i)->GetValue (v);
-      std::cout << v.Get () << "]:  "
+      os << v.Get () << "]:  "
                 << (*i)->GetHelp () << std::endl;
     }
 }
 
 void
-CommandLine::PrintAttributes (std::string type) const
+CommandLine::PrintAttributes (std::ostream &os, std::string type) const
 {
   TypeId tid;
   if (!TypeId::LookupByNameFailSafe (type, &tid))
@@ -158,39 +158,39 @@ CommandLine::PrintAttributes (std::string type) const
     }
   for (uint32_t i = 0; i < tid.GetAttributeN (); ++i)
     {
-      std::cout << "    --"<<tid.GetAttributeFullName (i)<<"=[";
+      os << "    --"<<tid.GetAttributeFullName (i)<<"=[";
       struct TypeId::AttributeInformation info = tid.GetAttribute (i);
-      std::cout << info.initialValue->SerializeToString (info.checker) << "]:  "
+      os << info.initialValue->SerializeToString (info.checker) << "]:  "
                 << info.help << std::endl;
     }
 }
 
 
 void
-CommandLine::PrintGroup (std::string group) const
+CommandLine::PrintGroup (std::ostream &os, std::string group) const
 {
   for (uint32_t i = 0; i < TypeId::GetRegisteredN (); ++i)
     {
       TypeId tid = TypeId::GetRegistered (i);
       if (tid.GetGroupName () == group)
         {
-          std::cout << "    --PrintAttributes=" <<tid.GetName ()<<std::endl;
+          os << "    --PrintAttributes=" <<tid.GetName ()<<std::endl;
         }
     }
 }
 
 void
-CommandLine::PrintTypeIds (void) const
+CommandLine::PrintTypeIds (std::ostream &os) const
 {
   for (uint32_t i = 0; i < TypeId::GetRegisteredN (); ++i)
     {
       TypeId tid = TypeId::GetRegistered (i);
-      std::cout << "    --PrintAttributes=" <<tid.GetName ()<<std::endl;
+      os << "    --PrintAttributes=" <<tid.GetName ()<<std::endl;
     }
 }
 
 void
-CommandLine::PrintGroups (void) const
+CommandLine::PrintGroups (std::ostream &os) const
 {
   std::list<std::string> groups;
   for (uint32_t i = 0; i < TypeId::GetRegisteredN (); ++i)
@@ -217,7 +217,7 @@ CommandLine::PrintGroups (void) const
     }
   for (std::list<std::string>::const_iterator k = groups.begin (); k != groups.end (); ++k)
     {
-      std::cout << "    --PrintGroup="<<*k<<std::endl;
+      os << "    --PrintGroup="<<*k<<std::endl;
     }
 }
 
@@ -228,37 +228,37 @@ CommandLine::HandleArgument (std::string name, std::string value) const
   if (name == "PrintHelp")
     {
       // method below never returns.
-      PrintHelp ();
+      PrintHelp (std::cout);
       std::exit (0);
     } 
   else if (name == "PrintGroups")
     {
       // method below never returns.
-      PrintGroups ();
+      PrintGroups (std::cout);
       std::exit (0);
     }
   else if (name == "PrintTypeIds")
     {
       // method below never returns.
-      PrintTypeIds ();
+      PrintTypeIds (std::cout);
       std::exit (0);
     }
   else if (name == "PrintGlobals")
     {
       // method below never returns.
-      PrintGlobals ();
+      PrintGlobals (std::cout);
       std::exit (0);
     }
   else if (name == "PrintGroup")
     {
       // method below never returns.
-      PrintGroup (value);
+      PrintGroup (std::cout, value);
       std::exit (0);
     }
   else if (name == "PrintAttributes")
     {
       // method below never returns.
-      PrintAttributes (value);
+      PrintAttributes (std::cout, value);
       std::exit (0);
     }
   else
@@ -283,7 +283,7 @@ CommandLine::HandleArgument (std::string name, std::string value) const
       && !Config::SetDefaultFailSafe (name, StringValue (value)))
     {
       std::cerr << "Invalid command-line arguments: --"<<name<<"="<<value<<std::endl;
-      PrintHelp ();
+      PrintHelp (std::cerr);
       std::exit (1);
     }
 }
