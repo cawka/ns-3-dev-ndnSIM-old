@@ -30,7 +30,7 @@
 
 #include <cmath>
 
-NS_LOG_COMPONENT_DEFINE ("DefaultSimulatorImpl");
+// NS_LOG_COMPONENT_DEFINE ("DefaultSimulatorImpl");
 
 namespace ns3 {
 
@@ -48,7 +48,7 @@ DefaultSimulatorImpl::GetTypeId (void)
 
 DefaultSimulatorImpl::DefaultSimulatorImpl ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   m_stop = false;
   // uids are allocated from 4.
   // uid 0 is "invalid" events
@@ -66,13 +66,13 @@ DefaultSimulatorImpl::DefaultSimulatorImpl ()
 
 DefaultSimulatorImpl::~DefaultSimulatorImpl ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
 }
 
 void
 DefaultSimulatorImpl::DoDispose (void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   while (!m_events->IsEmpty ())
     {
       Scheduler::Event next = m_events->RemoveNext ();
@@ -84,12 +84,12 @@ DefaultSimulatorImpl::DoDispose (void)
 void
 DefaultSimulatorImpl::Destroy ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   while (!m_destroyEvents.empty ()) 
     {
       Ptr<EventImpl> ev = m_destroyEvents.front ().PeekEventImpl ();
       m_destroyEvents.pop_front ();
-      NS_LOG_LOGIC ("handle destroy " << ev);
+      // NS_LOG_LOGIC ("handle destroy " << ev);
       if (!ev->IsCancelled ())
         {
           ev->Invoke ();
@@ -100,7 +100,7 @@ DefaultSimulatorImpl::Destroy ()
 void
 DefaultSimulatorImpl::SetScheduler (ObjectFactory schedulerFactory)
 {
-  NS_LOG_FUNCTION (this << &schedulerFactory);
+  // NS_LOG_FUNCTION (this << &schedulerFactory);
   Ptr<Scheduler> scheduler = schedulerFactory.Create<Scheduler> ();
 
   if (m_events != 0)
@@ -118,20 +118,20 @@ DefaultSimulatorImpl::SetScheduler (ObjectFactory schedulerFactory)
 uint32_t 
 DefaultSimulatorImpl::GetSystemId (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   return 0;
 }
 
 void
 DefaultSimulatorImpl::ProcessOneEvent (void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   Scheduler::Event next = m_events->RemoveNext ();
 
   NS_ASSERT (next.key.m_ts >= m_currentTs);
   m_unscheduledEvents--;
 
-  NS_LOG_LOGIC ("handle " << next.key.m_ts);
+  // NS_LOG_LOGIC ("handle " << next.key.m_ts);
   m_currentTs = next.key.m_ts;
   m_currentContext = next.key.m_context;
   m_currentUid = next.key.m_uid;
@@ -144,14 +144,14 @@ DefaultSimulatorImpl::ProcessOneEvent (void)
 bool 
 DefaultSimulatorImpl::IsFinished (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   return m_events->IsEmpty () || m_stop;
 }
 
 void
 DefaultSimulatorImpl::ProcessEventsWithContext (void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   if (m_eventsWithContextEmpty)
     {
       return;
@@ -182,7 +182,7 @@ DefaultSimulatorImpl::ProcessEventsWithContext (void)
 void
 DefaultSimulatorImpl::Run (void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   // Set the current threadId as the main threadId
   m_main = SystemThread::Self();
   ProcessEventsWithContext ();
@@ -201,14 +201,14 @@ DefaultSimulatorImpl::Run (void)
 void 
 DefaultSimulatorImpl::Stop (void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   m_stop = true;
 }
 
 void 
 DefaultSimulatorImpl::Stop (Time const &time)
 {
-  NS_LOG_FUNCTION (this << time.GetTimeStep ());
+  // NS_LOG_FUNCTION (this << time.GetTimeStep ());
   Simulator::Schedule (time, &Simulator::Stop);
 }
 
@@ -218,7 +218,7 @@ DefaultSimulatorImpl::Stop (Time const &time)
 EventId
 DefaultSimulatorImpl::Schedule (Time const &time, EventImpl *event)
 {
-  NS_LOG_FUNCTION (this << time.GetTimeStep () << event);
+  // NS_LOG_FUNCTION (this << time.GetTimeStep () << event);
   NS_ASSERT_MSG (SystemThread::Equals (m_main), "Simulator::Schedule Thread-unsafe invocation!");
 
   Time tAbsolute = time + TimeStep (m_currentTs);
@@ -239,7 +239,7 @@ DefaultSimulatorImpl::Schedule (Time const &time, EventImpl *event)
 void
 DefaultSimulatorImpl::ScheduleWithContext (uint32_t context, Time const &time, EventImpl *event)
 {
-  NS_LOG_FUNCTION (this << context << time.GetTimeStep () << m_currentTs << event);
+  // NS_LOG_FUNCTION (this << context << time.GetTimeStep () << m_currentTs << event);
 
   if (SystemThread::Equals (m_main))
     {
@@ -270,7 +270,7 @@ DefaultSimulatorImpl::ScheduleWithContext (uint32_t context, Time const &time, E
 EventId
 DefaultSimulatorImpl::ScheduleNow (EventImpl *event)
 {
-  NS_LOG_FUNCTION (this << event);
+  // NS_LOG_FUNCTION (this << event);
   NS_ASSERT_MSG (SystemThread::Equals (m_main), "Simulator::ScheduleNow Thread-unsafe invocation!");
 
   Scheduler::Event ev;
@@ -287,7 +287,7 @@ DefaultSimulatorImpl::ScheduleNow (EventImpl *event)
 EventId
 DefaultSimulatorImpl::ScheduleDestroy (EventImpl *event)
 {
-  NS_LOG_FUNCTION (this << event);
+  // NS_LOG_FUNCTION (this << event);
   NS_ASSERT_MSG (SystemThread::Equals (m_main), "Simulator::ScheduleDestroy Thread-unsafe invocation!");
 
   EventId id (Ptr<EventImpl> (event, false), m_currentTs, 0xffffffff, 2);
@@ -299,14 +299,14 @@ DefaultSimulatorImpl::ScheduleDestroy (EventImpl *event)
 Time
 DefaultSimulatorImpl::Now (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();  // !!! Logging cannot be here !!! This basically causes NS_LOG=* to create an infinite loop
   return TimeStep (m_currentTs);
 }
 
 Time 
 DefaultSimulatorImpl::GetDelayLeft (const EventId &id) const
 {
-  NS_LOG_FUNCTION (this << id.GetTs () << id.GetContext () << id.GetUid ());
+  // NS_LOG_FUNCTION (this << id.GetTs () << id.GetContext () << id.GetUid ());
   if (IsExpired (id))
     {
       return TimeStep (0);
@@ -320,7 +320,7 @@ DefaultSimulatorImpl::GetDelayLeft (const EventId &id) const
 void
 DefaultSimulatorImpl::Remove (const EventId &id)
 {
-  NS_LOG_FUNCTION (this << id.GetTs () << id.GetContext () << id.GetUid ());
+  // NS_LOG_FUNCTION (this << id.GetTs () << id.GetContext () << id.GetUid ());
   if (id.GetUid () == 2)
     {
       // destroy events.
@@ -354,7 +354,7 @@ DefaultSimulatorImpl::Remove (const EventId &id)
 void
 DefaultSimulatorImpl::Cancel (const EventId &id)
 {
-  NS_LOG_FUNCTION (this << id.GetTs () << id.GetContext () << id.GetUid ());
+  // NS_LOG_FUNCTION (this << id.GetTs () << id.GetContext () << id.GetUid ());
   if (!IsExpired (id))
     {
       id.PeekEventImpl ()->Cancel ();
@@ -364,7 +364,7 @@ DefaultSimulatorImpl::Cancel (const EventId &id)
 bool
 DefaultSimulatorImpl::IsExpired (const EventId &ev) const
 {
-  NS_LOG_FUNCTION (this << ev.GetTs () << ev.GetContext () << ev.GetUid ());
+  // NS_LOG_FUNCTION (this << ev.GetTs () << ev.GetContext () << ev.GetUid ());
   if (ev.GetUid () == 2)
     {
       if (ev.PeekEventImpl () == 0 ||
@@ -399,7 +399,7 @@ DefaultSimulatorImpl::IsExpired (const EventId &ev) const
 Time 
 DefaultSimulatorImpl::GetMaximumSimulationTime (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   // XXX: I am fairly certain other compilers use other non-standard
   // post-fixes to indicate 64 bit constants.
   return TimeStep (0x7fffffffffffffffLL);
@@ -408,7 +408,7 @@ DefaultSimulatorImpl::GetMaximumSimulationTime (void) const
 uint32_t
 DefaultSimulatorImpl::GetContext (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   return m_currentContext;
 }
 

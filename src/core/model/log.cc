@@ -261,7 +261,7 @@ LogComponent::Disable (enum LogLevel level)
 char const *
 LogComponent::Name (void) const
 {
-  return m_name;
+  return m_name.c_str ();
 }
 
 std::map<enum LogLevel, std::string>

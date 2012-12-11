@@ -394,7 +394,7 @@ public:
 private:
   std::map<enum LogLevel, std::string> LevelLabels() const;
   int32_t     m_levels;
-  char const *m_name;
+  std::string m_name;
 };
 
 class ParameterLogger : public std::ostream
