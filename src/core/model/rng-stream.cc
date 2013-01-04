@@ -24,6 +24,13 @@
 #include <iostream>
 #include "rng-stream.h"
 #include "fatal-error.h"
+#include "log.h"
+
+// Note:  Logging in this file is largely avoided due to the
+// number of calls that are made to these functions and the possibility
+// of causing recursions leading to stack overflow
+
+NS_LOG_COMPONENT_DEFINE ("RngStream");
 
 namespace
 {
@@ -183,6 +190,7 @@ void MatTwoPowModM (const Matrix src, Matrix dst, double m, int32_t e)
 /*
 void MatPowModM (const double A[3][3], double B[3][3], double m, int32_t n)
 {
+  NS_LOG_FUNCTION (A << B << m << n);
   int i, j;
   double W[3][3];
 

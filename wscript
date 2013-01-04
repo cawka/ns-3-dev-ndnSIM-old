@@ -342,9 +342,9 @@ def configure(conf):
         elif sys.platform == 'cygwin':
             env.append_value("LINKFLAGS", "-Wl,--enable-auto-import")
 
-        cxx, = env['CXX']
-
-        p = subprocess.Popen([cxx, '-print-file-name=libstdc++.so'], stdout=subprocess.PIPE)
+        cxx = env['CXX']
+        cxx_check_libstdcxx = cxx + ['-print-file-name=libstdc++.so']
+        p = subprocess.Popen(cxx_check_libstdcxx, stdout=subprocess.PIPE)
         libstdcxx_location = os.path.dirname(p.stdout.read().strip())
         p.wait()
         if libstdcxx_location:
@@ -885,7 +885,7 @@ def shutdown(ctx):
 
         # Print the list of enabled modules that were not built.
         if env['MODULES_NOT_BUILT']:
-            print 'Modules not built:'
+            print 'Modules not built (see ns-3 tutorial for explanation):'
             print_module_names(env['MODULES_NOT_BUILT'])
             print
 
